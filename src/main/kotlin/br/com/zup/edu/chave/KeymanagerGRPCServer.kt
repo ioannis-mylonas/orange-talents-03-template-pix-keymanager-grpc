@@ -22,17 +22,10 @@ class KeymanagerGRPCServer(
 
     @Transactional
     override fun cria(request: CreateKeyRequest, responseObserver: StreamObserver<CreateKeyResponse>) {
-        val errors = mutableSetOf<ConstraintViolation<*>>()
-        validators.forEach {
-            errors.addAll(it.validate(request.chave, request.tipoChave))
-        }
+        if (repository.existsByChave(request.chave)) return alreadyExists(responseObserver)
 
-        if (errors.isNotEmpty()) {
-            var status = Status.INVALID_ARGUMENT.withDescription("Pedido inválido.")
-            errors.forEach { status = status.augmentDescription(it.message) }
-            responseObserver.onError(status.asRuntimeException())
-            return
-        }
+        val errors = validate(request)
+        if (errors.isNotEmpty()) return invalidArgument(responseObserver, errors)
 
         val chave = if (request.chave.isNullOrBlank()) UUID.randomUUID().toString() else request.chave
         val chavePix = ChavePix(request.numero, request.tipoChave, chave, request.tipoConta)
@@ -44,5 +37,27 @@ class KeymanagerGRPCServer(
 
         responseObserver.onNext(response)
         responseObserver.onCompleted()
+    }
+
+    fun alreadyExists(responseObserver: StreamObserver<CreateKeyResponse>) {
+        val status = Status.ALREADY_EXISTS
+            .withDescription("Chave já cadastrada.")
+            .asRuntimeException()
+
+        responseObserver.onError(status)
+    }
+
+    fun invalidArgument(responseObserver: StreamObserver<CreateKeyResponse>, errors: Set<ConstraintViolation<*>>) {
+        var status = Status.INVALID_ARGUMENT.withDescription("Pedido inválido.")
+        errors.forEach { status = status.augmentDescription(it.message) }
+        responseObserver.onError(status.asRuntimeException())
+    }
+
+    fun validate(request: CreateKeyRequest): Set<ConstraintViolation<*>> {
+        val errors = mutableSetOf<ConstraintViolation<*>>()
+        validators.forEach {
+            errors.addAll(it.validate(request.chave, request.tipoChave))
+        }
+        return errors
     }
 }
