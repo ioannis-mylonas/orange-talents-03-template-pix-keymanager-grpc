@@ -4,6 +4,7 @@ import br.com.zup.edu.CreateKeyRequest
 import br.com.zup.edu.CreateKeyResponse
 import br.com.zup.edu.KeymanagerGRPCServiceGrpc
 import br.com.zup.edu.Open
+import br.com.zup.edu.chave.cliente.ValidaCliente
 import br.com.zup.edu.chave.validation.PixValidator
 import io.grpc.Status
 import io.grpc.stub.StreamObserver
@@ -17,12 +18,14 @@ import javax.validation.ConstraintViolation
 @Open
 class KeymanagerGRPCServer(
     @Inject val validators: Collection<PixValidator>,
-    @Inject val repository: ChavePixRepository
+    @Inject val repository: ChavePixRepository,
+    @Inject val validaCliente: ValidaCliente
 ): KeymanagerGRPCServiceGrpc.KeymanagerGRPCServiceImplBase() {
 
     @Transactional
     override fun cria(request: CreateKeyRequest, responseObserver: StreamObserver<CreateKeyResponse>) {
         if (repository.existsByChave(request.chave)) return alreadyExists(responseObserver)
+        if (!validaCliente(request, responseObserver)) return
 
         val errors = validate(request)
         if (errors.isNotEmpty()) return invalidArgument(responseObserver, errors)
@@ -59,5 +62,15 @@ class KeymanagerGRPCServer(
             errors.addAll(it.validate(request.chave, request.tipoChave))
         }
         return errors
+    }
+
+    fun validaCliente(request: CreateKeyRequest, responseObserver: StreamObserver<CreateKeyResponse>): Boolean {
+        try {
+            validaCliente.valida(request.numero, request.chave, request.tipoChave, request.tipoConta)
+            return true
+        } catch (e: RuntimeException) {
+            responseObserver.onError(e)
+            return false
+        }
     }
 }

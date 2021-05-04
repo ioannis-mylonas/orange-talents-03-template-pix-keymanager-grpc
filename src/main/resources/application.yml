@@ -9,3 +9,5 @@ datasources:
     password: ${DB_PASS:`password`}
     dialect: POSTGRES
 jpa.default.properties.hibernate.hbm2ddl.auto: create
+pix:
+  erp-url: ${ERP_URL:`http://localhost:9091`}
