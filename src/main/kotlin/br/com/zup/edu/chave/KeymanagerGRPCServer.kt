@@ -65,12 +65,12 @@ class KeymanagerGRPCServer(
     }
 
     fun validaCliente(request: CreateKeyRequest, responseObserver: StreamObserver<CreateKeyResponse>): Boolean {
-        try {
-            validaCliente.valida(request.numero, request.chave, request.tipoChave, request.tipoConta)
-            return true
-        } catch (e: RuntimeException) {
-            responseObserver.onError(e)
+        val erro = validaCliente.valida(request.numero, request.chave, request.tipoChave, request.tipoConta)
+
+        if (erro != null) {
+            responseObserver.onError(erro)
             return false
         }
+        return true
     }
 }
