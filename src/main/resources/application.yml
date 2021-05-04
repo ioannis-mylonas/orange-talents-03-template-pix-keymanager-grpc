@@ -1,0 +1,11 @@
+micronaut:
+  application:
+    name: keymanagerGRPC
+datasources:
+  default:
+    url: ${DB_URL:`jdbc:postgresql://localhost:5432/pix`}
+    driverClassName: org.postgresql.Driver
+    username: ${DB_USER:`keycloak`}
+    password: ${DB_PASS:`password`}
+    dialect: POSTGRES
+jpa.default.properties.hibernate.hbm2ddl.auto: create
