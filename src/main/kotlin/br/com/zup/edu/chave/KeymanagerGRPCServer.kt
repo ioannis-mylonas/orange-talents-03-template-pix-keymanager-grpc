@@ -5,6 +5,7 @@ import br.com.zup.edu.CreateKeyResponse
 import br.com.zup.edu.KeymanagerGRPCServiceGrpc
 import br.com.zup.edu.Open
 import br.com.zup.edu.chave.cliente.ChaveClient
+import br.com.zup.edu.chave.exceptions.handlers.ExceptionInterceptor
 import br.com.zup.edu.chave.extensions.toModel
 import br.com.zup.edu.chave.extensions.validate
 import br.com.zup.edu.chave.extensions.validateDadosClientes
@@ -24,10 +25,11 @@ class KeymanagerGRPCServer(
 ): KeymanagerGRPCServiceGrpc.KeymanagerGRPCServiceImplBase() {
 
     @Transactional
+    @ExceptionInterceptor
     override fun cria(request: CreateKeyRequest, responseObserver: StreamObserver<CreateKeyResponse>) {
-        if (!request.validateDadosClientes(client, responseObserver)) return
-        if (!request.validate(validators, responseObserver)) return
-        if (!request.validateUniqueness(repository, responseObserver)) return
+        request.validateDadosClientes(client)
+        request.validate(validators)
+        request.validateUniqueness(repository)
 
         val chave = request.toModel()
         repository.save(chave)
