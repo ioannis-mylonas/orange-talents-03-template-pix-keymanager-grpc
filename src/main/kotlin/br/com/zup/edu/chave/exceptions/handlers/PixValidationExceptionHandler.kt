@@ -1,12 +1,13 @@
 package br.com.zup.edu.chave.exceptions.handlers
 
+import br.com.zup.edu.chave.exceptions.PixException
 import br.com.zup.edu.chave.exceptions.PixValidationException
 import io.grpc.Status
 import javax.inject.Singleton
 
 @Singleton
 class PixValidationExceptionHandler: PixExceptionHandler<PixValidationException> {
-    override fun supports(e: RuntimeException): Boolean {
+    override fun supports(e: PixException): Boolean {
         return e is PixValidationException
     }
 

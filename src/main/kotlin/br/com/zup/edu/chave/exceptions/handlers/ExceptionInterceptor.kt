@@ -14,7 +14,10 @@ import javax.inject.Singleton
 import kotlin.annotation.AnnotationTarget.*
 import kotlin.annotation.AnnotationRetention.*
 
-@Target(CLASS, FILE, FUNCTION, PROPERTY_GETTER, PROPERTY_SETTER)
+/**
+ * Marca o método para ser interceptado em busca de PixExceptions.
+ */
+@Target(FUNCTION, PROPERTY_GETTER, PROPERTY_SETTER)
 @Retention(RUNTIME)
 @Around
 annotation class ExceptionInterceptor()

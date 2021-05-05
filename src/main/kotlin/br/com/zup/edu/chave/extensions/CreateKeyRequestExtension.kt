@@ -26,8 +26,7 @@ fun CreateKeyRequest.toModel(): ChavePix {
 }
 
 /**
- * Valida a chave PIX conforme uma Collection de PixValidator.
- * @return True se todas as validações passaram, caso contrário, false.
+ * Valida a chave PIX conforme uma Collection de PixValidators.
  */
 fun CreateKeyRequest.validate(validators: Collection<PixValidator>) {
     validators.forEach {
@@ -36,8 +35,8 @@ fun CreateKeyRequest.validate(validators: Collection<PixValidator>) {
 }
 
 /**
- * Valida se a chave PIX especificada é única. Caso falhe, processamento deve ser parado imediatamente.
- * @return True se for única, false caso contrário.
+ * Valida se a chave PIX especificada é única.
+ * @throws PixAlreadyExistsException Se a chave já existir no banco de dados.
  */
 fun CreateKeyRequest.validateUniqueness(repository: ChavePixRepository) {
     if (repository.existsByChave(chave)) {
@@ -46,8 +45,10 @@ fun CreateKeyRequest.validateUniqueness(repository: ChavePixRepository) {
 }
 
 /**
- * Valida dados do cliente conforme ERP. Caso algum erro seja encontrado, o processamento deve parar imediatamente.
- * @return True se os dados são válidos. False caso algum erro seja encontrado.
+ * Valida dados do cliente conforme ERP.
+ * @param client Uma instância de HTTP client que possa fazer a requisição ao ERP.
+ * @throws PixClientNotFoundException Se o número ou tipo de conta não for encontrado.
+ * @throws PixClientWrongCpfException Se o CPF não bater com o cadastro no ERP.
  */
 fun CreateKeyRequest.validateDadosClientes(client: ChaveClient) {
     val detalhes = try {

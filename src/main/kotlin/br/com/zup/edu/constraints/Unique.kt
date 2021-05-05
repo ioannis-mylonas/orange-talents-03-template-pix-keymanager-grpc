@@ -11,6 +11,12 @@ import javax.transaction.Transactional
 import javax.validation.Constraint
 import kotlin.reflect.KClass
 
+/**
+ * Validador que espera que o valor seja único no banco de dados,
+ * conforme coluna e tipo especificados.
+ * @param field Campo/coluna que deve ter valor único
+ * @param target Classe/tabela a ser buscada no banco de dados
+ */
 @Constraint(validatedBy = [ UniqueValidator::class ])
 @Target(AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)

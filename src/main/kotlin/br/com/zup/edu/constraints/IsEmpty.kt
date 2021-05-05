@@ -6,6 +6,9 @@ import io.micronaut.validation.validator.constraints.ConstraintValidatorContext
 import javax.inject.Singleton
 import javax.validation.Constraint
 
+/**
+ * Validador que espera o objeto anotado como tendo valor null ou empty.
+ */
 @Constraint(validatedBy = [ IsEmptyValidator::class ])
 @Target(AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)
