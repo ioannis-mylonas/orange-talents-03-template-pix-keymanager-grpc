@@ -25,9 +25,9 @@ class KeymanagerGRPCServer(
 
     @Transactional
     override fun cria(request: CreateKeyRequest, responseObserver: StreamObserver<CreateKeyResponse>) {
-        if (!request.validateUniqueness(repository, responseObserver)) return
         if (!request.validateDadosClientes(client, responseObserver)) return
         if (!request.validate(validators, responseObserver)) return
+        if (!request.validateUniqueness(repository, responseObserver)) return
 
         val chave = request.toModel()
         repository.save(chave)

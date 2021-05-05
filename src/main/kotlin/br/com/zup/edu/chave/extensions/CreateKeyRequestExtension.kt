@@ -9,6 +9,7 @@ import br.com.zup.edu.chave.cliente.ChaveClient
 import br.com.zup.edu.chave.validation.PixValidator
 import io.grpc.Status
 import io.grpc.stub.StreamObserver
+import io.micronaut.http.client.exceptions.HttpClientResponseException
 import java.util.*
 import javax.validation.ConstraintViolation
 
@@ -61,7 +62,13 @@ fun CreateKeyRequest.validateUniqueness(repository: ChavePixRepository, observer
  * @return True se os dados são válidos. False caso algum erro seja encontrado.
  */
 fun CreateKeyRequest.validateDadosClientes(client: ChaveClient, observer: StreamObserver<CreateKeyResponse>): Boolean {
-    val detalhes = client.buscaDetalhes(numero, tipoConta)
+    val detalhes = try {
+        client.buscaDetalhes(numero, tipoConta)
+    } catch (e: HttpClientResponseException) {
+        println("Conta de ID $numero não encontrada.")
+        null
+    }
+
     if (detalhes == null) {
         val status = Status.NOT_FOUND
             .withDescription("Conta não encontrada no sistema.")
