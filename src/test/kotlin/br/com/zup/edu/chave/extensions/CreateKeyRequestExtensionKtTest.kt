@@ -61,7 +61,7 @@ internal class CreateKeyRequestExtensionKtTest {
 
     @Test
     fun `Testa busca cliente CPF invalido`() {
-        val titular = ClienteDetalhesTitular(UUID.randomUUID().toString())
+        val titular = ClienteDetalhesTitular(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         val detalhes = ClienteDetalhes(titular)
 
         Mockito.`when`(mockChaveClient.buscaDetalhes(Mockito.anyString(), MockitoHelper.anyObject()))
@@ -86,7 +86,7 @@ internal class CreateKeyRequestExtensionKtTest {
 
     @Test
     fun `Testa cliente CPF invalido por gRPC`() {
-        val titular = ClienteDetalhesTitular(UUID.randomUUID().toString())
+        val titular = ClienteDetalhesTitular(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         val detalhes = ClienteDetalhes(titular)
 
         Mockito.`when`(mockChaveClient.buscaDetalhes(Mockito.anyString(), MockitoHelper.anyObject()))
