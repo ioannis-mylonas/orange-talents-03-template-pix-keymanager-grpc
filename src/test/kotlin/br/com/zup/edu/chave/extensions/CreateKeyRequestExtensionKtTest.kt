@@ -5,11 +5,10 @@ import br.com.zup.edu.chave.cliente.ChaveClient
 import br.com.zup.edu.chave.cliente.ClienteDetalhes
 import br.com.zup.edu.chave.cliente.ClienteDetalhesTitular
 import br.com.zup.edu.chave.exceptions.PixClientNotFoundException
-import br.com.zup.edu.chave.exceptions.PixClientWrongCpfException
+import br.com.zup.edu.chave.exceptions.PixPermissionDeniedException
 import io.grpc.ManagedChannel
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
-import io.micronaut.context.annotation.Factory
 import io.micronaut.grpc.annotation.GrpcChannel
 import io.micronaut.grpc.server.GrpcServerChannel
 import io.micronaut.http.client.exceptions.HttpClientResponseException
@@ -68,7 +67,7 @@ internal class CreateKeyRequestExtensionKtTest {
         Mockito.`when`(mockChaveClient.buscaDetalhes(Mockito.anyString(), MockitoHelper.anyObject()))
             .thenReturn(detalhes)
 
-        assertThrows(PixClientWrongCpfException::class.java) {
+        assertThrows(PixPermissionDeniedException::class.java) {
             request.validateDadosClientes(mockChaveClient)
         }
     }

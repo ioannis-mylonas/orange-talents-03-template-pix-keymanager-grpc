@@ -7,7 +7,7 @@ import br.com.zup.edu.chave.ChavePixRepository
 import br.com.zup.edu.chave.cliente.ChaveClient
 import br.com.zup.edu.chave.exceptions.PixAlreadyExistsException
 import br.com.zup.edu.chave.exceptions.PixClientNotFoundException
-import br.com.zup.edu.chave.exceptions.PixClientWrongCpfException
+import br.com.zup.edu.chave.exceptions.PixPermissionDeniedException
 import br.com.zup.edu.chave.validation.PixValidator
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import java.util.*
@@ -44,7 +44,7 @@ fun CreateKeyRequest.validateUniqueness(repository: ChavePixRepository) {
  * Valida dados do cliente conforme ERP.
  * @param client Uma instância de HTTP client que possa fazer a requisição ao ERP.
  * @throws PixClientNotFoundException Se o número ou tipo de conta não for encontrado.
- * @throws PixClientWrongCpfException Se o CPF não bater com o cadastro no ERP.
+ * @throws PixPermissionDeniedException Se o CPF não bater com o cadastro no ERP.
  */
 fun CreateKeyRequest.validateDadosClientes(client: ChaveClient) {
     val detalhes = try {
@@ -54,6 +54,6 @@ fun CreateKeyRequest.validateDadosClientes(client: ChaveClient) {
     } ?: throw PixClientNotFoundException(numero, tipoConta)
 
     if (tipoChave == TipoChave.CPF && chave != detalhes.titular.cpf) {
-        throw PixClientWrongCpfException()
+        throw PixPermissionDeniedException()
     }
 }

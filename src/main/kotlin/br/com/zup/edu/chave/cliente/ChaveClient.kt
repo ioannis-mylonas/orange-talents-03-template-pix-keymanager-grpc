@@ -10,4 +10,7 @@ import io.micronaut.http.client.annotation.Client
 interface ChaveClient {
     @Get("/api/v1/clientes/{id}/contas")
     fun buscaDetalhes(@PathVariable id: String, @QueryValue tipo: TipoConta): ClienteDetalhes?
+
+    @Get("/api/v1/clientes/{id}")
+    fun buscaCliente(@PathVariable id: String): ClienteDetalhesTitular?
 }

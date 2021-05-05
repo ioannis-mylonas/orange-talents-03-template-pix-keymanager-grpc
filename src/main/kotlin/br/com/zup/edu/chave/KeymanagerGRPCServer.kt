@@ -1,15 +1,11 @@
 package br.com.zup.edu.chave
 
-import br.com.zup.edu.CreateKeyRequest
-import br.com.zup.edu.CreateKeyResponse
-import br.com.zup.edu.KeymanagerGRPCServiceGrpc
-import br.com.zup.edu.Open
+import br.com.zup.edu.*
 import br.com.zup.edu.chave.cliente.ChaveClient
+import br.com.zup.edu.chave.exceptions.PixChaveNotFound
+import br.com.zup.edu.chave.exceptions.PixClientKeyPermissionException
 import br.com.zup.edu.chave.exceptions.handlers.ExceptionInterceptor
-import br.com.zup.edu.chave.extensions.toModel
-import br.com.zup.edu.chave.extensions.validate
-import br.com.zup.edu.chave.extensions.validateDadosClientes
-import br.com.zup.edu.chave.extensions.validateUniqueness
+import br.com.zup.edu.chave.extensions.*
 import br.com.zup.edu.chave.validation.PixValidator
 import io.grpc.stub.StreamObserver
 import javax.inject.Inject
@@ -35,8 +31,25 @@ class KeymanagerGRPCServer(
         repository.save(chave)
 
         val response = CreateKeyResponse.newBuilder()
-            .setId(chave.id.toString())
+            .setId(chave.id)
             .build()
+
+        responseObserver.onNext(response)
+        responseObserver.onCompleted()
+    }
+
+    @Transactional
+    @ExceptionInterceptor
+    override fun delete(request: DeleteKeyRequest, responseObserver: StreamObserver<DeleteKeyResponse>) {
+        request.validaCliente(client)
+
+        val chave = repository.findById(request.id).orElseThrow { PixChaveNotFound() }
+        if (!request.isDono(chave)) throw PixClientKeyPermissionException()
+
+        repository.delete(chave)
+
+        // Se eventualmente o retorno mudar, temos um builder aqui
+        val response = DeleteKeyResponse.newBuilder().build()
 
         responseObserver.onNext(response)
         responseObserver.onCompleted()

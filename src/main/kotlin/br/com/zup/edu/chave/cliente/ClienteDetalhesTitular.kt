@@ -5,5 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 @Open
 data class ClienteDetalhesTitular(
+    @JsonProperty val id: String,
     @JsonProperty val cpf: String
 )

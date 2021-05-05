@@ -9,6 +9,7 @@ package br.com.zup.edu;
 
 service KeymanagerGRPCService {
   rpc cria (CreateKeyRequest) returns (CreateKeyResponse) {}
+  rpc delete (DeleteKeyRequest) returns (DeleteKeyResponse) {}
 }
 
 enum TipoChave {
@@ -31,5 +32,12 @@ message CreateKeyRequest {
 }
 
 message CreateKeyResponse {
-  string id = 1;
+  int64 id = 1;
 }
+
+message DeleteKeyRequest {
+  int64 id = 1;
+  string numero = 2;
+}
+
+message DeleteKeyResponse {}
