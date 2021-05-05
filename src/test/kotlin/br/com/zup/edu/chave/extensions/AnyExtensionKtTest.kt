@@ -22,11 +22,9 @@ internal class AnyExtensionKtTest {
         assertEquals("{\"nome\":\"\"}", json)
     }
 
-    @Factory
-    class Clients {
-        @Singleton
-        fun blockingStub(@GrpcChannel(GrpcServerChannel.NAME) channel: ManagedChannel): KeymanagerGRPCServiceGrpc.KeymanagerGRPCServiceBlockingStub {
-            return KeymanagerGRPCServiceGrpc.newBlockingStub(channel)
-        }
+
+    @Singleton
+    fun blockingStub(@GrpcChannel(GrpcServerChannel.NAME) channel: ManagedChannel): KeymanagerGRPCServiceGrpc.KeymanagerGRPCServiceBlockingStub {
+        return KeymanagerGRPCServiceGrpc.newBlockingStub(channel)
     }
 }

@@ -3,6 +3,7 @@ package br.com.zup.edu.chave.extensions
 import br.com.zup.edu.*
 import br.com.zup.edu.chave.cliente.ChaveClient
 import br.com.zup.edu.chave.cliente.ClienteDetalhes
+import br.com.zup.edu.chave.cliente.ClienteDetalhesTitular
 import br.com.zup.edu.chave.exceptions.PixClientNotFoundException
 import br.com.zup.edu.chave.exceptions.PixClientWrongCpfException
 import io.grpc.ManagedChannel
@@ -61,11 +62,11 @@ internal class CreateKeyRequestExtensionKtTest {
 
     @Test
     fun `Testa busca cliente CPF invalido`() {
-        val mockDetalhes = Mockito.mock(ClienteDetalhes::class.java, Mockito.RETURNS_DEEP_STUBS)
-        Mockito.`when`(mockChaveClient.buscaDetalhes(Mockito.anyString(), MockitoHelper.anyObject()))
-            .thenReturn(mockDetalhes)
+        val titular = ClienteDetalhesTitular(UUID.randomUUID().toString())
+        val detalhes = ClienteDetalhes(titular)
 
-        Mockito.`when`(mockDetalhes.titular.cpf).thenReturn(UUID.randomUUID().toString())
+        Mockito.`when`(mockChaveClient.buscaDetalhes(Mockito.anyString(), MockitoHelper.anyObject()))
+            .thenReturn(detalhes)
 
         assertThrows(PixClientWrongCpfException::class.java) {
             request.validateDadosClientes(mockChaveClient)
@@ -86,11 +87,11 @@ internal class CreateKeyRequestExtensionKtTest {
 
     @Test
     fun `Testa cliente CPF invalido por gRPC`() {
-        val mockDetalhes = Mockito.mock(ClienteDetalhes::class.java, Mockito.RETURNS_DEEP_STUBS)
-        Mockito.`when`(mockChaveClient.buscaDetalhes(Mockito.anyString(), MockitoHelper.anyObject()))
-            .thenReturn(mockDetalhes)
+        val titular = ClienteDetalhesTitular(UUID.randomUUID().toString())
+        val detalhes = ClienteDetalhes(titular)
 
-        Mockito.`when`(mockDetalhes.titular.cpf).thenReturn(UUID.randomUUID().toString())
+        Mockito.`when`(mockChaveClient.buscaDetalhes(Mockito.anyString(), MockitoHelper.anyObject()))
+            .thenReturn(detalhes)
 
         val erro = assertThrows(StatusRuntimeException::class.java) {
             client.cria(request)
@@ -104,11 +105,8 @@ internal class CreateKeyRequestExtensionKtTest {
         return Mockito.mock(ChaveClient::class.java)
     }
 
-    @Factory
-    class Clients {
-        @Singleton
-        fun blockingStub(@GrpcChannel(GrpcServerChannel.NAME) channel: ManagedChannel): KeymanagerGRPCServiceGrpc.KeymanagerGRPCServiceBlockingStub {
-            return KeymanagerGRPCServiceGrpc.newBlockingStub(channel)
-        }
+    @Singleton
+    fun blockingStub(@GrpcChannel(GrpcServerChannel.NAME) channel: ManagedChannel): KeymanagerGRPCServiceGrpc.KeymanagerGRPCServiceBlockingStub {
+        return KeymanagerGRPCServiceGrpc.newBlockingStub(channel)
     }
 }
