@@ -3,7 +3,6 @@ package br.com.zup.edu.chave
 import br.com.zup.edu.*
 import br.com.zup.edu.chave.cliente.ChaveClient
 import br.com.zup.edu.chave.cliente.ClienteDetalhes
-import br.com.zup.edu.chave.cliente.ClienteDetalhesTitular
 import io.grpc.ManagedChannel
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
@@ -13,7 +12,8 @@ import io.micronaut.grpc.server.GrpcServerChannel
 import io.micronaut.test.annotation.MockBean
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EmptySource
@@ -24,9 +24,10 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @MicronautTest
-internal class KeymanagerGRPCServerTest {
+internal class TestaValidacaoConstraints {
     @Inject lateinit var client: KeymanagerGRPCServiceGrpc.KeymanagerGRPCServiceBlockingStub
     @Inject lateinit var repository: ChavePixRepository
+    @Inject lateinit var mockChaveClient: ChaveClient
 
     private val DEFAULT_NUMERO = UUID.randomUUID().toString()
     private val DEFAULT_TIPO_CONTA = TipoConta.CONTA_CORRENTE
@@ -39,18 +40,13 @@ internal class KeymanagerGRPCServerTest {
         .setTipoChave(DEFAULT_TIPO_CHAVE)
         .setChave(DEFAULT_CHAVE)
 
-    @MockBean(ChaveClient::class)
-    fun chaveClient(): ChaveClient {
-        val result = Mockito.mock(ChaveClient::class.java)
-
-        // Não consegui fazer funcionar `when`(chaveClient().buscaDetalhes(Mockito.anyString(), MockitoHelper.anyObject()))
-        Mockito.`when`(result.buscaDetalhes(Mockito.anyString(), MockitoHelper.anyObject()))
-            .thenReturn(mockDetalhes)
-
-        return result
-    }
-
     private val mockDetalhes = Mockito.mock(ClienteDetalhes::class.java, Mockito.RETURNS_DEEP_STUBS)
+
+    @BeforeEach
+    fun setup() {
+        Mockito.`when`(mockChaveClient.buscaDetalhes(Mockito.anyString(), MockitoHelper.anyObject()))
+            .thenReturn(mockDetalhes)
+    }
 
     @AfterEach
     fun teardown() {
@@ -86,6 +82,25 @@ internal class KeymanagerGRPCServerTest {
             .build()
 
         client.cria(request)
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["12345678901", "01234567890", "10320064042", "42423029080"])
+    fun `testa requisicao CPF ja existente`(cpf: String) {
+        Mockito.`when`(mockDetalhes.titular.cpf).thenReturn(cpf)
+
+        val request = requestBuilder
+            .setTipoChave(TipoChave.CPF)
+            .setChave(cpf)
+            .build()
+
+        client.cria(request)
+
+        val error = assertThrows(StatusRuntimeException::class.java) {
+            client.cria(request)
+        }
+
+        assertEquals(Status.ALREADY_EXISTS.code, error.status.code)
     }
 
     @ParameterizedTest
@@ -144,7 +159,7 @@ internal class KeymanagerGRPCServerTest {
 
     @ParameterizedTest
     @ValueSource(strings = ["+123", "+12345678912345", "+5585988714077"])
-    fun `testa requisicao chave ja existente invalido`(celular: String) {
+    fun `testa requisicao celular ja existente`(celular: String) {
         val request = requestBuilder
             .setTipoChave(TipoChave.CELULAR)
             .setChave(celular)
@@ -161,7 +176,7 @@ internal class KeymanagerGRPCServerTest {
 
     @ParameterizedTest
     @ValueSource(strings = ["a", "+5585988714077", "joao@email.com", "42423029080"])
-    fun `testa requisicao aleatorio invalido`(aleatorio: String) {
+    fun `testa requisicao aleatorio string invalido`(aleatorio: String) {
         val request = requestBuilder
             .setTipoChave(TipoChave.ALEATORIO)
             .setChave(aleatorio)
@@ -183,6 +198,11 @@ internal class KeymanagerGRPCServerTest {
             .build()
 
         client.cria(request)
+    }
+
+    @MockBean(ChaveClient::class)
+    fun chaveClient(): ChaveClient {
+        return Mockito.mock(ChaveClient::class.java)
     }
 
     @Factory

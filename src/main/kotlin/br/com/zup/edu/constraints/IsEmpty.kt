@@ -17,16 +17,14 @@ annotation class IsEmpty(
 )
 
 @Singleton
-class IsEmptyValidator: ConstraintValidator<IsEmpty, Any> {
+class IsEmptyValidator: ConstraintValidator<IsEmpty, String> {
     override fun isValid(
-        value: Any?,
+        value: String?,
         annotationMetadata: AnnotationValue<IsEmpty>,
         context: ConstraintValidatorContext
     ): Boolean {
 
         if (value == null) return true
-        if (value is String) return value.isBlank()
-
-        return false
+        return value.isBlank()
     }
 }

@@ -1,18 +1,15 @@
 package br.com.zup.edu.chave.exceptions.handlers
 
-import br.com.zup.edu.chave.KeymanagerGRPCServer
 import br.com.zup.edu.chave.exceptions.PixException
-import io.grpc.*
 import io.grpc.stub.StreamObserver
 import io.micronaut.aop.Around
 import io.micronaut.aop.InterceptorBean
 import io.micronaut.aop.MethodInterceptor
 import io.micronaut.aop.MethodInvocationContext
-import org.slf4j.LoggerFactory
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.annotation.AnnotationRetention.RUNTIME
 import kotlin.annotation.AnnotationTarget.*
-import kotlin.annotation.AnnotationRetention.*
 
 /**
  * Marca o método para ser interceptado em busca de PixExceptions.

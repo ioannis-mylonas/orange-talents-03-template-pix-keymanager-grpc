@@ -1,7 +1,6 @@
 package br.com.zup.edu.chave.extensions
 
 import br.com.zup.edu.CreateKeyRequest
-import br.com.zup.edu.CreateKeyResponse
 import br.com.zup.edu.TipoChave
 import br.com.zup.edu.chave.ChavePix
 import br.com.zup.edu.chave.ChavePixRepository
@@ -10,11 +9,8 @@ import br.com.zup.edu.chave.exceptions.PixAlreadyExistsException
 import br.com.zup.edu.chave.exceptions.PixClientNotFoundException
 import br.com.zup.edu.chave.exceptions.PixClientWrongCpfException
 import br.com.zup.edu.chave.validation.PixValidator
-import io.grpc.Status
-import io.grpc.stub.StreamObserver
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import java.util.*
-import javax.validation.ConstraintViolation
 
 /**
  * Converte a request para o model, para ser persistido no banco de dados.
