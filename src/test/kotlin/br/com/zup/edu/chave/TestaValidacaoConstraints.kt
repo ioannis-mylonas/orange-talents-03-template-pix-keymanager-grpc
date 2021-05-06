@@ -204,9 +204,4 @@ internal class TestaValidacaoConstraints {
     fun chaveClient(): ChaveClient {
         return Mockito.mock(ChaveClient::class.java)
     }
-
-    @Singleton
-    fun blockingStub(@GrpcChannel(GrpcServerChannel.NAME) channel: ManagedChannel): KeymanagerGRPCServiceGrpc.KeymanagerGRPCServiceBlockingStub {
-        return KeymanagerGRPCServiceGrpc.newBlockingStub(channel)
-    }
 }

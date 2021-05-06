@@ -6,9 +6,6 @@ import br.com.zup.edu.TipoChave
 import br.com.zup.edu.TipoConta
 import br.com.zup.edu.chave.cliente.ChaveClient
 import br.com.zup.edu.chave.cliente.ClienteDetalhesTitular
-import io.grpc.ManagedChannel
-import io.micronaut.grpc.annotation.GrpcChannel
-import io.micronaut.grpc.server.GrpcServerChannel
 import io.micronaut.test.annotation.MockBean
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.jboss.logging.Logger
@@ -17,7 +14,6 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import java.util.*
 import javax.inject.Inject
-import javax.inject.Singleton
 import javax.transaction.Transactional
 
 @MicronautTest
@@ -55,10 +51,5 @@ internal class TestaExclusaoChavePix {
     @MockBean(ChaveClient::class)
     fun chaveClient(): ChaveClient {
         return Mockito.mock(ChaveClient::class.java)
-    }
-
-    @Singleton
-    fun blockingStub(@GrpcChannel(GrpcServerChannel.NAME) channel: ManagedChannel): KeymanagerGRPCServiceGrpc.KeymanagerGRPCServiceBlockingStub {
-        return KeymanagerGRPCServiceGrpc.newBlockingStub(channel)
     }
 }
