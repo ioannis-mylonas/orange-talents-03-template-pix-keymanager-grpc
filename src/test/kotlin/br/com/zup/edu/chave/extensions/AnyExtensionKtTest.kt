@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import javax.inject.Singleton
 
-@MicronautTest
+@MicronautTest(transactional = false, rollback = false)
 internal class AnyExtensionKtTest {
     private data class JsonTestClass(val nome: String = "")
 

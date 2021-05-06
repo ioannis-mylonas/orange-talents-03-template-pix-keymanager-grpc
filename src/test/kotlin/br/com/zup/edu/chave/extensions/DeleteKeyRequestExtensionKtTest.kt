@@ -14,7 +14,7 @@ import org.mockito.Mockito
 import java.util.*
 import kotlin.random.Random
 
-@MicronautTest
+@MicronautTest(transactional = false, rollback = false)
 internal class DeleteKeyRequestExtensionKtTest {
     private val client: ChaveClient = Mockito.mock(ChaveClient::class.java)
 

@@ -1,6 +1,7 @@
 package br.com.zup.edu.chave.extensions
 
 import br.com.zup.edu.*
+import br.com.zup.edu.chave.ChavePixRepository
 import br.com.zup.edu.chave.cliente.ChaveClient
 import br.com.zup.edu.chave.cliente.ClienteDetalhes
 import br.com.zup.edu.chave.cliente.ClienteDetalhesTitular
@@ -14,6 +15,7 @@ import io.micronaut.grpc.server.GrpcServerChannel
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.test.annotation.MockBean
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
@@ -22,10 +24,11 @@ import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@MicronautTest
+@MicronautTest(transactional = false, rollback = false)
 internal class CreateKeyRequestExtensionKtTest {
     @Inject lateinit var mockChaveClient: ChaveClient
     @Inject lateinit var client: KeymanagerGRPCServiceGrpc.KeymanagerGRPCServiceBlockingStub
+    @Inject lateinit var repository: ChavePixRepository
 
     private val DEFAULT_NUMERO = UUID.randomUUID().toString()
     private val DEFAULT_TIPO_CONTA = TipoConta.CONTA_CORRENTE
@@ -38,6 +41,11 @@ internal class CreateKeyRequestExtensionKtTest {
         .setNumero(DEFAULT_NUMERO)
         .setTipoConta(DEFAULT_TIPO_CONTA)
         .build()
+
+    @AfterEach
+    fun teardown() {
+        repository.deleteAll()
+    }
 
     @Test
     fun `Testa cliente nao encontrado no ERP`() {
