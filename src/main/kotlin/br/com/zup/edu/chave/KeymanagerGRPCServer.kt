@@ -20,7 +20,6 @@ class KeymanagerGRPCServer(
     @Inject val client: ChaveClient
 ): KeymanagerGRPCServiceGrpc.KeymanagerGRPCServiceImplBase() {
 
-    @Transactional
     @ExceptionInterceptor
     override fun cria(request: CreateKeyRequest, responseObserver: StreamObserver<CreateKeyResponse>) {
         request.validateDadosClientes(client)
