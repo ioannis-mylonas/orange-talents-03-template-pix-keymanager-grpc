@@ -30,13 +30,12 @@ internal class TestaExclusaoChavePix {
 
     @Test
     fun `testa exclui chave pix existente`() {
-        val titular = ClienteDetalhesTitular(DEFAULT_NUMERO, "12345678901")
+        val titular = ClienteDetalhesTitular(DEFAULT_NUMERO, "NOME", "12345678901")
         Mockito.`when`(client.buscaCliente(Mockito.anyString())).thenReturn(titular)
 
-        var chave = ChavePix(titular.id,
-            TipoChave.ALEATORIO,
+        var chave = ChavePix(TipoChave.RANDOM,
             UUID.randomUUID().toString(),
-            TipoConta.CONTA_CORRENTE)
+            TipoConta.CONTA_CORRENTE, titular.cpf)
 
         chave = repository.save(chave)
         assertTrue(repository.count() == 1L)
@@ -52,13 +51,12 @@ internal class TestaExclusaoChavePix {
 
     @Test
     fun `testa exception sem permissao para excluir chave`() {
-        val titular = ClienteDetalhesTitular(DEFAULT_NUMERO, "12345678901")
+        val titular = ClienteDetalhesTitular(DEFAULT_NUMERO, "NOME", "12345678901")
         Mockito.`when`(client.buscaCliente(Mockito.anyString())).thenReturn(titular)
 
-        var chave = ChavePix(UUID.randomUUID().toString(),
-            TipoChave.ALEATORIO,
+        var chave = ChavePix(TipoChave.RANDOM,
             UUID.randomUUID().toString(),
-            TipoConta.CONTA_CORRENTE)
+            TipoConta.CONTA_CORRENTE, UUID.randomUUID().toString())
 
         chave = repository.save(chave)
         assertTrue(repository.count() == 1L)
@@ -77,7 +75,7 @@ internal class TestaExclusaoChavePix {
 
     @Test
     fun `testa exception chave inexistente`() {
-        val titular = ClienteDetalhesTitular(DEFAULT_NUMERO, "12345678901")
+        val titular = ClienteDetalhesTitular(DEFAULT_NUMERO, "NOME", "12345678901")
         Mockito.`when`(client.buscaCliente(Mockito.anyString())).thenReturn(titular)
 
         assertTrue(repository.count() == 0L)

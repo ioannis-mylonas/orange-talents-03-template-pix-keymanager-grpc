@@ -15,4 +15,11 @@ enum class BcbAccountType {
             }
         }
     }
+
+    fun toTipoConta(): TipoConta {
+        return when (this) {
+            CACC -> TipoConta.CONTA_CORRENTE
+            SVGS -> TipoConta.CONTA_POUPANCA
+        }
+    }
 }

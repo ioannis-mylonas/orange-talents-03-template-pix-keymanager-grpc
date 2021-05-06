@@ -15,9 +15,8 @@ internal class ChavePixRepositoryTest {
     @Inject lateinit var repository: ChavePixRepository
 
     private val valor = UUID.randomUUID().toString()
-    private val chave = ChavePix(UUID.randomUUID().toString(),
-        TipoChave.ALEATORIO, valor,
-        TipoConta.CONTA_CORRENTE)
+    private val chave = ChavePix(TipoChave.RANDOM, valor,
+        TipoConta.CONTA_CORRENTE, UUID.randomUUID().toString())
 
     @BeforeEach
     fun setup() {

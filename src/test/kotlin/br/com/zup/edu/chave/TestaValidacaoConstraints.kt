@@ -135,7 +135,7 @@ internal class TestaValidacaoConstraints {
     @ValueSource(strings = ["1", "123", "+12", "+12345678912345678"])
     fun `testa requisicao celular invalido`(celular: String) {
         val request = requestBuilder
-            .setTipoChave(TipoChave.CELULAR)
+            .setTipoChave(TipoChave.PHONE)
             .setChave(celular)
             .build()
 
@@ -150,7 +150,7 @@ internal class TestaValidacaoConstraints {
     @ValueSource(strings = ["+123", "+12345678912345", "+5585988714077"])
     fun `testa requisicao celular valido`(celular: String) {
         val request = requestBuilder
-            .setTipoChave(TipoChave.CELULAR)
+            .setTipoChave(TipoChave.PHONE)
             .setChave(celular)
             .build()
 
@@ -161,7 +161,7 @@ internal class TestaValidacaoConstraints {
     @ValueSource(strings = ["+123", "+12345678912345", "+5585988714077"])
     fun `testa requisicao celular ja existente`(celular: String) {
         val request = requestBuilder
-            .setTipoChave(TipoChave.CELULAR)
+            .setTipoChave(TipoChave.PHONE)
             .setChave(celular)
             .build()
 
@@ -178,7 +178,7 @@ internal class TestaValidacaoConstraints {
     @ValueSource(strings = ["a", "+5585988714077", "joao@email.com", "42423029080"])
     fun `testa requisicao aleatorio string invalido`(aleatorio: String) {
         val request = requestBuilder
-            .setTipoChave(TipoChave.ALEATORIO)
+            .setTipoChave(TipoChave.RANDOM)
             .setChave(aleatorio)
             .build()
 
@@ -193,7 +193,7 @@ internal class TestaValidacaoConstraints {
     @EmptySource
     fun `testa requisicao aleatorio valido`(aleatorio: String) {
         val request = requestBuilder
-            .setTipoChave(TipoChave.ALEATORIO)
+            .setTipoChave(TipoChave.RANDOM)
             .setChave(aleatorio)
             .build()
 

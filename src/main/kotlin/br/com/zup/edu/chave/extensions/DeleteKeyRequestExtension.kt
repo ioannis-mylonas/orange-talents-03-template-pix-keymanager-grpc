@@ -26,6 +26,7 @@ fun DeleteKeyRequest.validaCliente(client: ChaveClient): ClienteDetalhesTitular 
  * @param chave Chave PIX a ser verificada.
  * @return True se o cliente for dono, false caso contrário.
  */
-fun DeleteKeyRequest.isDono(chave: ChavePix): Boolean {
-    return chave.numero == numero && chave.id == id
+fun DeleteKeyRequest.isDono(chave: ChavePix, titular: ClienteDetalhesTitular): Boolean {
+    return (titular.cpf == chave.cpf &&
+            chave.id == id)
 }

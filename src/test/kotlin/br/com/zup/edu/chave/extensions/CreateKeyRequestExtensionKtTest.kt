@@ -4,6 +4,7 @@ import br.com.zup.edu.*
 import br.com.zup.edu.chave.ChavePixRepository
 import br.com.zup.edu.chave.cliente.ChaveClient
 import br.com.zup.edu.chave.cliente.ClienteDetalhes
+import br.com.zup.edu.chave.cliente.ClienteDetalhesInstituicao
 import br.com.zup.edu.chave.cliente.ClienteDetalhesTitular
 import br.com.zup.edu.chave.exceptions.PixClientNotFoundException
 import br.com.zup.edu.chave.exceptions.PixPermissionDeniedException
@@ -69,8 +70,9 @@ internal class CreateKeyRequestExtensionKtTest {
 
     @Test
     fun `Testa busca cliente CPF invalido`() {
-        val titular = ClienteDetalhesTitular(UUID.randomUUID().toString(), UUID.randomUUID().toString())
-        val detalhes = ClienteDetalhes(titular)
+        val titular = ClienteDetalhesTitular(UUID.randomUUID().toString(), "NOME", UUID.randomUUID().toString())
+        val instituicao = ClienteDetalhesInstituicao("NOME", "ISPB")
+        val detalhes = ClienteDetalhes(TipoConta.CONTA_CORRENTE, instituicao, "AGENCIA", "NUMERO", titular)
 
         Mockito.`when`(mockChaveClient.buscaDetalhes(Mockito.anyString(), MockitoHelper.anyObject()))
             .thenReturn(detalhes)
@@ -94,8 +96,9 @@ internal class CreateKeyRequestExtensionKtTest {
 
     @Test
     fun `Testa cliente CPF invalido por gRPC`() {
-        val titular = ClienteDetalhesTitular(UUID.randomUUID().toString(), UUID.randomUUID().toString())
-        val detalhes = ClienteDetalhes(titular)
+        val titular = ClienteDetalhesTitular(UUID.randomUUID().toString(), "NOME", UUID.randomUUID().toString())
+        val instituicao = ClienteDetalhesInstituicao("NOME", "ISPB")
+        val detalhes = ClienteDetalhes(TipoConta.CONTA_CORRENTE, instituicao, "AGENCIA", "NUMERO", titular)
 
         Mockito.`when`(mockChaveClient.buscaDetalhes(Mockito.anyString(), MockitoHelper.anyObject()))
             .thenReturn(detalhes)

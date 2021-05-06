@@ -9,10 +9,10 @@ import javax.validation.constraints.Size
 
 @Entity
 data class ChavePix(
-    @field:NotBlank val numero: String,
     @field:Enumerated(EnumType.STRING) @field:NotNull val tipoChave: TipoChave,
     @field:NotBlank @field:Size(max = 77) val chave: String,
-    @field:Enumerated(EnumType.STRING) @field:NotNull val tipoConta: TipoConta
+    @field:Enumerated(EnumType.STRING) @field:NotNull val tipoConta: TipoConta,
+    @field:NotBlank val cpf: String
 ) {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0

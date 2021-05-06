@@ -5,20 +5,15 @@ import br.com.zup.edu.chave.bcb.BcbClient
 import br.com.zup.edu.chave.bcb.BcbCreatePixKeyRequest
 import br.com.zup.edu.chave.bcb.BcbDeletePixKeyRequest
 import br.com.zup.edu.chave.cliente.ChaveClient
-import br.com.zup.edu.chave.exceptions.PixAlreadyExistsException
-import br.com.zup.edu.chave.exceptions.PixChaveNotFound
-import br.com.zup.edu.chave.exceptions.PixClientKeyPermissionException
-import br.com.zup.edu.chave.exceptions.PixPermissionDeniedException
+import br.com.zup.edu.chave.exceptions.*
 import br.com.zup.edu.chave.exceptions.handlers.ExceptionInterceptor
 import br.com.zup.edu.chave.extensions.*
 import br.com.zup.edu.chave.validation.PixValidator
 import io.grpc.stub.StreamObserver
 import io.micronaut.http.HttpStatus
 import io.micronaut.http.client.exceptions.HttpClientResponseException
-import org.jboss.logging.Logger
 import javax.inject.Inject
 import javax.inject.Singleton
-import javax.transaction.Transactional
 
 @Singleton
 @Open
@@ -38,7 +33,7 @@ class KeymanagerGRPCServer(
             val bcbRequest = BcbCreatePixKeyRequest.fromDetalhesCliente(detalhes, request)
             bcbClient.cadastra(bcbRequest)
 
-            val chave = request.toModel()
+            val chave = request.toModel(detalhes)
             repository.save(chave)
 
             val response = CreateKeyResponse.newBuilder()
@@ -48,8 +43,11 @@ class KeymanagerGRPCServer(
             responseObserver.onNext(response)
             responseObserver.onCompleted()
         } catch (e: HttpClientResponseException) {
-            if (e.status == HttpStatus.UNPROCESSABLE_ENTITY) throw PixAlreadyExistsException()
-            throw e
+            when (e.status) {
+                HttpStatus.UNPROCESSABLE_ENTITY -> throw PixAlreadyExistsException()
+                HttpStatus.BAD_REQUEST -> throw PixValidationException(e.localizedMessage)
+                else -> throw e
+            }
         }
     }
 
@@ -58,7 +56,7 @@ class KeymanagerGRPCServer(
         val dados = request.validaCliente(client)
 
         val chave = repository.findById(request.id).orElseThrow { PixChaveNotFound() }
-        if (!request.isDono(chave)) throw PixClientKeyPermissionException()
+        if (!request.isDono(chave, dados)) throw PixClientKeyPermissionException()
 
         try {
             val bcbRequest = BcbDeletePixKeyRequest(chave.chave)

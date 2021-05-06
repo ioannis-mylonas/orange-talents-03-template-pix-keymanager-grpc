@@ -17,9 +17,9 @@ import java.util.*
  * Converte a request para o model, para ser persistido no banco de dados.
  * @return ChavePix com os dados especificados, pronta para ser persistida.
  */
-fun CreateKeyRequest.toModel(): ChavePix {
+fun CreateKeyRequest.toModel(detalhes: ClienteDetalhes): ChavePix {
     val key = if (chave.isNullOrBlank()) UUID.randomUUID().toString() else chave
-    return ChavePix(numero, tipoChave, key, tipoConta)
+    return ChavePix(tipoChave, key, tipoConta, detalhes.titular.cpf)
 }
 
 /**

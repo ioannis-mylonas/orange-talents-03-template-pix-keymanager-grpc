@@ -1,7 +1,6 @@
 package br.com.zup.edu.chave.bcb
 
 import br.com.zup.edu.Open
-import br.com.zup.edu.TipoConta
 import com.fasterxml.jackson.annotation.JsonProperty
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull

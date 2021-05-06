@@ -5,6 +5,7 @@ import br.com.zup.edu.TipoChave
 import br.com.zup.edu.TipoConta
 import br.com.zup.edu.chave.ChavePix
 import br.com.zup.edu.chave.cliente.ChaveClient
+import br.com.zup.edu.chave.cliente.ClienteDetalhesTitular
 import br.com.zup.edu.chave.exceptions.PixClientNotFoundException
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
@@ -51,44 +52,47 @@ internal class DeleteKeyRequestExtensionKtTest {
 
     @Test
     fun `testa is dono true`() {
-        val numero = UUID.randomUUID().toString()
+        val cpf = UUID.randomUUID().toString()
         val key = UUID.randomUUID().toString()
 
-        val chave = ChavePix(numero, TipoChave.ALEATORIO, key, TipoConta.CONTA_CORRENTE)
+        val titular = ClienteDetalhesTitular("ID", "NOME", cpf)
+        val chave = ChavePix(TipoChave.RANDOM, key, TipoConta.CONTA_CORRENTE, cpf)
         val request = DeleteKeyRequest
             .newBuilder()
-            .setNumero(numero)
+            .setNumero(cpf)
             .setId(chave.id)
             .build()
 
-        assertTrue(request.isDono(chave))
+        assertTrue(request.isDono(chave, titular))
     }
 
     @Test
-    fun `testa is dono false numero errado`() {
-        val numero = UUID.randomUUID().toString()
+    fun `testa is dono false cpf errado`() {
+        val cpf = UUID.randomUUID().toString()
         val key = UUID.randomUUID().toString()
 
-        val chave = ChavePix(numero, TipoChave.ALEATORIO, key, TipoConta.CONTA_CORRENTE)
+        val titular = ClienteDetalhesTitular("ID", "NOME", UUID.randomUUID().toString())
+        val chave = ChavePix(TipoChave.RANDOM, key, TipoConta.CONTA_CORRENTE, cpf)
         val request = DeleteKeyRequest.newBuilder()
             .setNumero(UUID.randomUUID().toString())
             .setId(chave.id)
             .build()
 
-        assertTrue(!request.isDono(chave))
+        assertTrue(!request.isDono(chave, titular))
     }
 
     @Test
     fun `testa is dono false id errado`() {
-        val numero = UUID.randomUUID().toString()
+        val cpf = UUID.randomUUID().toString()
         val key = UUID.randomUUID().toString()
 
-        val chave = ChavePix(numero, TipoChave.ALEATORIO, key, TipoConta.CONTA_CORRENTE)
+        val titular = ClienteDetalhesTitular("ID", "NOME", cpf)
+        val chave = ChavePix(TipoChave.RANDOM, key, TipoConta.CONTA_CORRENTE, cpf)
         val request = DeleteKeyRequest.newBuilder()
-            .setNumero(numero)
+            .setNumero(cpf)
             .setId(Random.nextLong())
             .build()
 
-        assertTrue(!request.isDono(chave))
+        assertTrue(!request.isDono(chave, titular))
     }
 }
