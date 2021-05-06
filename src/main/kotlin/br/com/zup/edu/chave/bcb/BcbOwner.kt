@@ -7,7 +7,7 @@ import javax.validation.constraints.NotNull
 
 @Open
 data class BcbOwner(
-    @NotNull @JsonProperty val type: BcbOwnerType,
-    @NotBlank @JsonProperty val name: String,
-    @NotBlank @JsonProperty val taxIdNumber: String
+    @field:NotNull @JsonProperty val type: BcbOwnerType,
+    @field:NotBlank @JsonProperty val name: String,
+    @field:NotBlank @JsonProperty val taxIdNumber: String
 )

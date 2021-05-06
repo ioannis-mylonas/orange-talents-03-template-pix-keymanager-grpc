@@ -6,6 +6,9 @@ import br.com.zup.edu.chave.cliente.ChaveClient
 import br.com.zup.edu.chave.cliente.ClienteDetalhesTitular
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
+import io.micronaut.http.HttpResponse
+import io.micronaut.http.HttpStatus
+import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.test.annotation.MockBean
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.AfterEach
@@ -21,6 +24,7 @@ internal class TestaExclusaoChavePix {
     @Inject lateinit var rpc: KeymanagerGRPCServiceGrpc.KeymanagerGRPCServiceBlockingStub
     @Inject lateinit var repository: ChavePixRepository
     @Inject lateinit var client: ChaveClient
+    @Inject lateinit var bcbClient: BcbClient
 
     private val DEFAULT_NUMERO = UUID.randomUUID().toString()
 
@@ -51,6 +55,33 @@ internal class TestaExclusaoChavePix {
     }
 
     @Test
+    fun `testa chave inexistente BCB`() {
+        val titular = ClienteDetalhesTitular(DEFAULT_NUMERO, "NOME", "12345678901")
+        Mockito.`when`(client.buscaCliente(Mockito.anyString())).thenReturn(titular)
+
+        var chave = ChavePix(TipoChave.RANDOM,
+            UUID.randomUUID().toString(),
+            TipoConta.CONTA_CORRENTE, titular.cpf)
+
+        chave = repository.save(chave)
+        assertTrue(repository.count() == 1L)
+
+        val request = DeleteKeyRequest.newBuilder()
+            .setId(chave.id)
+            .setNumero(titular.id)
+            .build()
+
+        Mockito.`when`(bcbClient.deleta(Mockito.anyString(), MockitoHelper.anyObject()))
+            .thenThrow(HttpClientResponseException("", HttpResponse.notFound<Any>()))
+
+        val erro = assertThrows(StatusRuntimeException::class.java) {
+            rpc.delete(request)
+        }
+
+        assertEquals(Status.NOT_FOUND.code, erro.status.code)
+    }
+
+    @Test
     fun `testa exception sem permissao para excluir chave`() {
         val titular = ClienteDetalhesTitular(DEFAULT_NUMERO, "NOME", "12345678901")
         Mockito.`when`(client.buscaCliente(Mockito.anyString())).thenReturn(titular)
@@ -61,6 +92,34 @@ internal class TestaExclusaoChavePix {
 
         chave = repository.save(chave)
         assertTrue(repository.count() == 1L)
+
+        val request = DeleteKeyRequest.newBuilder()
+            .setId(chave.id)
+            .setNumero(titular.id)
+            .build()
+
+        val erro = assertThrows(StatusRuntimeException::class.java) {
+            rpc.delete(request)
+        }
+
+        assertEquals(Status.PERMISSION_DENIED.code, erro.status.code)
+    }
+
+    @Test
+    fun `testa exception sem permissao para excluir chave BCB`() {
+        val cpf = UUID.randomUUID().toString()
+        val titular = ClienteDetalhesTitular(DEFAULT_NUMERO, "NOME", cpf)
+        Mockito.`when`(client.buscaCliente(Mockito.anyString())).thenReturn(titular)
+
+        var chave = ChavePix(TipoChave.RANDOM,
+            UUID.randomUUID().toString(),
+            TipoConta.CONTA_CORRENTE, cpf)
+
+        chave = repository.save(chave)
+        assertTrue(repository.count() == 1L)
+
+        Mockito.`when`(bcbClient.deleta(Mockito.anyString(), MockitoHelper.anyObject()))
+            .thenThrow(HttpClientResponseException("", HttpResponse.status<Any>(HttpStatus.FORBIDDEN)))
 
         val request = DeleteKeyRequest.newBuilder()
             .setId(chave.id)

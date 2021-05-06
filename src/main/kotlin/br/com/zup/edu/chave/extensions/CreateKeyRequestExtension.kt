@@ -8,6 +8,7 @@ import br.com.zup.edu.chave.cliente.ChaveClient
 import br.com.zup.edu.chave.cliente.ClienteDetalhes
 import br.com.zup.edu.chave.exceptions.PixAlreadyExistsException
 import br.com.zup.edu.chave.exceptions.PixClientNotFoundException
+import br.com.zup.edu.chave.exceptions.PixClientWrongCpfException
 import br.com.zup.edu.chave.exceptions.PixPermissionDeniedException
 import br.com.zup.edu.chave.validation.PixValidator
 import io.micronaut.http.client.exceptions.HttpClientResponseException
@@ -17,9 +18,8 @@ import java.util.*
  * Converte a request para o model, para ser persistido no banco de dados.
  * @return ChavePix com os dados especificados, pronta para ser persistida.
  */
-fun CreateKeyRequest.toModel(detalhes: ClienteDetalhes): ChavePix {
-    val key = if (chave.isNullOrBlank()) UUID.randomUUID().toString() else chave
-    return ChavePix(tipoChave, key, tipoConta, detalhes.titular.cpf)
+fun CreateKeyRequest.toModel(detalhes: ClienteDetalhes, chave: String): ChavePix {
+    return ChavePix(tipoChave, chave, tipoConta, detalhes.titular.cpf)
 }
 
 /**
@@ -55,7 +55,7 @@ fun CreateKeyRequest.validateDadosClientes(client: ChaveClient): ClienteDetalhes
     } ?: throw PixClientNotFoundException(numero, tipoConta)
 
     if (tipoChave == TipoChave.CPF && chave != detalhes.titular.cpf) {
-        throw PixPermissionDeniedException()
+        throw PixClientWrongCpfException()
     }
 
     return detalhes

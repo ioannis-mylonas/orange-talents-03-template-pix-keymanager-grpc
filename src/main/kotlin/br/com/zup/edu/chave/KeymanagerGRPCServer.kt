@@ -31,9 +31,9 @@ class KeymanagerGRPCServer(
 
         try {
             val bcbRequest = BcbCreatePixKeyRequest.fromDetalhesCliente(detalhes, request)
-            bcbClient.cadastra(bcbRequest)
+            val bcbResponse = bcbClient.cadastra(bcbRequest)
 
-            val chave = request.toModel(detalhes)
+            val chave = request.toModel(detalhes, bcbResponse.key)
             repository.save(chave)
 
             val response = CreateKeyResponse.newBuilder()

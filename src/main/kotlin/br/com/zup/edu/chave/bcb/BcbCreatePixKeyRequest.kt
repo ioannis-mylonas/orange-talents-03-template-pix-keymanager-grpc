@@ -6,14 +6,18 @@ import br.com.zup.edu.TipoChave
 import br.com.zup.edu.chave.cliente.ClienteDetalhes
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.micronaut.core.annotation.Introspected
+import javax.validation.Valid
+import javax.validation.constraints.NotBlank
+import javax.validation.constraints.NotNull
+import javax.validation.constraints.Size
 
 @Introspected
 @Open
 data class BcbCreatePixKeyRequest(
-    @JsonProperty val keyType: TipoChave,
-    @JsonProperty val key: String,
-    @JsonProperty val bankAccount: BcbBankAccount,
-    @JsonProperty val owner: BcbOwner
+    @field:NotNull @JsonProperty val keyType: TipoChave,
+    @field:Size(max = 77) @JsonProperty val key: String,
+    @field:NotNull @field:Valid @JsonProperty val bankAccount: BcbBankAccount,
+    @field:NotNull @field:Valid @JsonProperty val owner: BcbOwner
 ) {
     companion object {
         fun fromDetalhesCliente(detalhes: ClienteDetalhes, request: CreateKeyRequest): BcbCreatePixKeyRequest {

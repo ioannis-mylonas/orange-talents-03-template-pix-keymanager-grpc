@@ -8,6 +8,6 @@ import javax.validation.constraints.NotBlank
 @Introspected
 @Open
 data class BcbDeletePixKeyRequest(
-    @NotBlank @JsonProperty val key: String,
-    @NotBlank @JsonProperty val participant: String = "60701190"
+    @field:NotBlank @JsonProperty val key: String,
+    @field:NotBlank @JsonProperty val participant: String = "60701190"
 )

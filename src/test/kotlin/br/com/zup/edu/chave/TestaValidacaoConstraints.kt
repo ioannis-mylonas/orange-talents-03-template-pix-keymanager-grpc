@@ -12,6 +12,8 @@ import io.grpc.StatusRuntimeException
 import io.micronaut.context.annotation.Factory
 import io.micronaut.grpc.annotation.GrpcChannel
 import io.micronaut.grpc.server.GrpcServerChannel
+import io.micronaut.http.HttpResponse
+import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.test.annotation.MockBean
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.AfterEach
@@ -31,6 +33,7 @@ internal class TestaValidacaoConstraints {
     @Inject lateinit var client: KeymanagerGRPCServiceGrpc.KeymanagerGRPCServiceBlockingStub
     @Inject lateinit var repository: ChavePixRepository
     @Inject lateinit var mockChaveClient: ChaveClient
+    @Inject lateinit var mockBcbClient: BcbClient
 
     private val DEFAULT_NUMERO = UUID.randomUUID().toString()
     private val DEFAULT_TIPO_CONTA = TipoConta.CONTA_CORRENTE
@@ -68,6 +71,7 @@ internal class TestaValidacaoConstraints {
 
         Mockito.`when`(mockChaveClient.buscaDetalhes(Mockito.anyString(), MockitoHelper.anyObject()))
             .thenReturn(detalhes)
+        Mockito.`when`(mockBcbClient.cadastra(MockitoHelper.anyObject()).key).thenReturn(cpf)
 
         val request = requestBuilder
             .setTipoChave(TipoChave.CPF)
@@ -90,6 +94,7 @@ internal class TestaValidacaoConstraints {
 
         Mockito.`when`(mockChaveClient.buscaDetalhes(Mockito.anyString(), MockitoHelper.anyObject()))
             .thenReturn(detalhes)
+        Mockito.`when`(mockBcbClient.cadastra(MockitoHelper.anyObject()).key).thenReturn(cpf)
 
         val request = requestBuilder
             .setTipoChave(TipoChave.CPF)
@@ -108,6 +113,7 @@ internal class TestaValidacaoConstraints {
 
         Mockito.`when`(mockChaveClient.buscaDetalhes(Mockito.anyString(), MockitoHelper.anyObject()))
             .thenReturn(detalhes)
+        Mockito.`when`(mockBcbClient.cadastra(MockitoHelper.anyObject()).key).thenReturn(cpf)
 
         val request = requestBuilder
             .setTipoChave(TipoChave.CPF)
@@ -115,6 +121,32 @@ internal class TestaValidacaoConstraints {
             .build()
 
         client.cria(request)
+
+        val error = assertThrows(StatusRuntimeException::class.java) {
+            client.cria(request)
+        }
+
+        assertEquals(Status.ALREADY_EXISTS.code, error.status.code)
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["12345678901", "01234567890", "10320064042", "42423029080"])
+    fun `testa requisicao CPF ja existente BCB`(cpf: String) {
+        val instituicao = ClienteDetalhesInstituicao("NOME", "ISPB")
+        val titular = ClienteDetalhesTitular("ID", "NOME", cpf)
+        val detalhes = ClienteDetalhes(DEFAULT_TIPO_CONTA, instituicao, "AGENCIA", DEFAULT_NUMERO, titular)
+
+        Mockito.`when`(mockChaveClient.buscaDetalhes(Mockito.anyString(), MockitoHelper.anyObject()))
+            .thenReturn(detalhes)
+        Mockito.`when`(mockBcbClient.cadastra(MockitoHelper.anyObject()).key).thenReturn(cpf)
+
+        val request = requestBuilder
+            .setTipoChave(TipoChave.CPF)
+            .setChave(cpf)
+            .build()
+
+        Mockito.`when`(mockBcbClient.cadastra(MockitoHelper.anyObject()))
+            .thenThrow(HttpClientResponseException("", HttpResponse.unprocessableEntity<Any>()))
 
         val error = assertThrows(StatusRuntimeException::class.java) {
             client.cria(request)
@@ -132,6 +164,7 @@ internal class TestaValidacaoConstraints {
             .setChave(email)
             .build()
 
+        Mockito.`when`(mockBcbClient.cadastra(MockitoHelper.anyObject()).key).thenReturn(email)
         val erro = assertThrows(StatusRuntimeException::class.java) {
             client.cria(request)
         }
@@ -147,6 +180,7 @@ internal class TestaValidacaoConstraints {
             .setChave(email)
             .build()
 
+        Mockito.`when`(mockBcbClient.cadastra(MockitoHelper.anyObject()).key).thenReturn(email)
         client.cria(request)
     }
 
@@ -159,6 +193,7 @@ internal class TestaValidacaoConstraints {
             .setChave(celular)
             .build()
 
+        Mockito.`when`(mockBcbClient.cadastra(MockitoHelper.anyObject()).key).thenReturn(celular)
         val erro = assertThrows(StatusRuntimeException::class.java) {
             client.cria(request)
         }
@@ -174,6 +209,7 @@ internal class TestaValidacaoConstraints {
             .setChave(celular)
             .build()
 
+        Mockito.`when`(mockBcbClient.cadastra(MockitoHelper.anyObject()).key).thenReturn(celular)
         client.cria(request)
     }
 
@@ -185,6 +221,7 @@ internal class TestaValidacaoConstraints {
             .setChave(celular)
             .build()
 
+        Mockito.`when`(mockBcbClient.cadastra(MockitoHelper.anyObject()).key).thenReturn(celular)
         client.cria(request)
 
         val erro = assertThrows(StatusRuntimeException::class.java) {
@@ -202,6 +239,7 @@ internal class TestaValidacaoConstraints {
             .setChave(aleatorio)
             .build()
 
+        Mockito.`when`(mockBcbClient.cadastra(MockitoHelper.anyObject()).key).thenReturn(aleatorio)
         val erro = assertThrows(StatusRuntimeException::class.java) {
             client.cria(request)
         }
@@ -217,7 +255,27 @@ internal class TestaValidacaoConstraints {
             .setChave(aleatorio)
             .build()
 
+        Mockito.`when`(mockBcbClient.cadastra(MockitoHelper.anyObject()).key)
+            .thenReturn(UUID.randomUUID().toString())
         client.cria(request)
+    }
+
+    @ParameterizedTest
+    @EmptySource
+    fun `testa requisicao aleatorio invalido BCB`(aleatorio: String) {
+        val request = requestBuilder
+            .setTipoChave(TipoChave.RANDOM)
+            .setChave(aleatorio)
+            .build()
+
+        Mockito.`when`(mockBcbClient.cadastra(MockitoHelper.anyObject()))
+            .thenThrow(HttpClientResponseException("", HttpResponse.badRequest<Any>()))
+
+        val erro = assertThrows(StatusRuntimeException::class.java) {
+            client.cria(request)
+        }
+
+        assertEquals(Status.INVALID_ARGUMENT.code, erro.status.code)
     }
 
     @MockBean(ChaveClient::class)
@@ -227,6 +285,6 @@ internal class TestaValidacaoConstraints {
 
     @MockBean(BcbClient::class)
     fun bcbClient(): BcbClient {
-        return Mockito.mock(BcbClient::class.java)
+        return Mockito.mock(BcbClient::class.java, Mockito.RETURNS_DEEP_STUBS)
     }
 }
