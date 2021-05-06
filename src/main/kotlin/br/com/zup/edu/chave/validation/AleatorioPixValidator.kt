@@ -9,7 +9,7 @@ import javax.inject.Singleton
 @Open
 class AleatorioPixValidator: PixValidator {
     override fun shouldValidate(chave: String?, tipo: TipoChave): Boolean {
-        return tipo == TipoChave.ALEATORIO
+        return tipo == TipoChave.RANDOM
     }
 
     override fun check(@IsEmpty chave: String?) {}

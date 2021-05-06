@@ -13,7 +13,7 @@ import javax.validation.constraints.Size
 @Open
 class CelularPixValidator(@Inject val validator: Validator): PixValidator {
     override fun shouldValidate(chave: String?, tipo: TipoChave): Boolean {
-        return tipo == TipoChave.CELULAR
+        return tipo == TipoChave.PHONE
     }
 
     override fun check(@Pattern(regexp = "^\\+[1-9][0-9]\\d{1,14}\$", message = "Formato de celular inválido.")

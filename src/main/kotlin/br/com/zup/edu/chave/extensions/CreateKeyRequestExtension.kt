@@ -5,6 +5,7 @@ import br.com.zup.edu.TipoChave
 import br.com.zup.edu.chave.ChavePix
 import br.com.zup.edu.chave.ChavePixRepository
 import br.com.zup.edu.chave.cliente.ChaveClient
+import br.com.zup.edu.chave.cliente.ClienteDetalhes
 import br.com.zup.edu.chave.exceptions.PixAlreadyExistsException
 import br.com.zup.edu.chave.exceptions.PixClientNotFoundException
 import br.com.zup.edu.chave.exceptions.PixPermissionDeniedException
@@ -46,7 +47,7 @@ fun CreateKeyRequest.validateUniqueness(repository: ChavePixRepository) {
  * @throws PixClientNotFoundException Se o número ou tipo de conta não for encontrado.
  * @throws PixPermissionDeniedException Se o CPF não bater com o cadastro no ERP.
  */
-fun CreateKeyRequest.validateDadosClientes(client: ChaveClient) {
+fun CreateKeyRequest.validateDadosClientes(client: ChaveClient): ClienteDetalhes {
     val detalhes = try {
         client.buscaDetalhes(numero, tipoConta)
     } catch (e: HttpClientResponseException) {
@@ -56,4 +57,6 @@ fun CreateKeyRequest.validateDadosClientes(client: ChaveClient) {
     if (tipoChave == TipoChave.CPF && chave != detalhes.titular.cpf) {
         throw PixPermissionDeniedException()
     }
+
+    return detalhes
 }

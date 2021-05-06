@@ -14,9 +14,10 @@ service KeymanagerGRPCService {
 
 enum TipoChave {
   CPF = 0;
-  CELULAR = 1;
-  EMAIL = 2;
-  ALEATORIO = 3;
+  CNPJ = 1;
+  PHONE = 2;
+  EMAIL = 3;
+  RANDOM = 4;
 }
 
 enum TipoConta {

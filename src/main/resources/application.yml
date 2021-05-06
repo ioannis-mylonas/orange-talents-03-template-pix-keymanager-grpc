@@ -11,3 +11,4 @@ datasources:
 jpa.default.properties.hibernate.hbm2ddl.auto: create
 pix:
   erp-url: ${ERP_URL:`http://localhost:9091`}
+  bcb-url: ${BCB_URL:`http://localhost:8082`}

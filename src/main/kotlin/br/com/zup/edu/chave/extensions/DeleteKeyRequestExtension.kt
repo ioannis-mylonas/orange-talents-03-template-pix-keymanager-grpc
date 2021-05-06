@@ -3,6 +3,7 @@ package br.com.zup.edu.chave.extensions
 import br.com.zup.edu.DeleteKeyRequest
 import br.com.zup.edu.chave.ChavePix
 import br.com.zup.edu.chave.cliente.ChaveClient
+import br.com.zup.edu.chave.cliente.ClienteDetalhesTitular
 import br.com.zup.edu.chave.exceptions.PixClientNotFoundException
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 
@@ -11,12 +12,13 @@ import io.micronaut.http.client.exceptions.HttpClientResponseException
  * @param client Um client para consulta no ERP.
  * @throws PixClientNotFoundException Se o cliente não for encontrado.
  */
-fun DeleteKeyRequest.validaCliente(client: ChaveClient) {
+fun DeleteKeyRequest.validaCliente(client: ChaveClient): ClienteDetalhesTitular {
     val cliente = try {
         client.buscaCliente(numero)
     } catch (e: HttpClientResponseException) { null }
 
     cliente ?: throw PixClientNotFoundException(numero)
+    return cliente
 }
 
 /**
