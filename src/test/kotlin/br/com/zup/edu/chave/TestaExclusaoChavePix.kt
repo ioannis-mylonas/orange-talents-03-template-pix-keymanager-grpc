@@ -1,6 +1,7 @@
 package br.com.zup.edu.chave
 
 import br.com.zup.edu.*
+import br.com.zup.edu.chave.bcb.BcbClient
 import br.com.zup.edu.chave.cliente.ChaveClient
 import br.com.zup.edu.chave.cliente.ClienteDetalhesTitular
 import io.grpc.Status
@@ -95,5 +96,10 @@ internal class TestaExclusaoChavePix {
     @MockBean(ChaveClient::class)
     fun chaveClient(): ChaveClient {
         return Mockito.mock(ChaveClient::class.java)
+    }
+
+    @MockBean(BcbClient::class)
+    fun bcbClient(): BcbClient {
+        return Mockito.mock(BcbClient::class.java)
     }
 }

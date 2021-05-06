@@ -1,8 +1,11 @@
 package br.com.zup.edu.chave
 
 import br.com.zup.edu.*
+import br.com.zup.edu.chave.bcb.BcbClient
 import br.com.zup.edu.chave.cliente.ChaveClient
 import br.com.zup.edu.chave.cliente.ClienteDetalhes
+import br.com.zup.edu.chave.cliente.ClienteDetalhesInstituicao
+import br.com.zup.edu.chave.cliente.ClienteDetalhesTitular
 import io.grpc.ManagedChannel
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
@@ -40,12 +43,14 @@ internal class TestaValidacaoConstraints {
         .setTipoChave(DEFAULT_TIPO_CHAVE)
         .setChave(DEFAULT_CHAVE)
 
-    private val mockDetalhes = Mockito.mock(ClienteDetalhes::class.java, Mockito.RETURNS_DEEP_STUBS)
+    private val instituicao = ClienteDetalhesInstituicao("NOME", "ISPB")
+    private val titular = ClienteDetalhesTitular("ID", "NOME", DEFAULT_NUMERO)
+    private val detalhes = ClienteDetalhes(DEFAULT_TIPO_CONTA, instituicao, "AGENCIA", DEFAULT_NUMERO, titular)
 
     @BeforeEach
     fun setup() {
         Mockito.`when`(mockChaveClient.buscaDetalhes(Mockito.anyString(), MockitoHelper.anyObject()))
-            .thenReturn(mockDetalhes)
+            .thenReturn(detalhes)
     }
 
     @AfterEach
@@ -57,7 +62,12 @@ internal class TestaValidacaoConstraints {
     @EmptySource
     @ValueSource(strings = ["1", "123", "123.456.789-30", "123456789-30"])
     fun `testa requisicao CPF pattern invalida`(cpf: String) {
-        Mockito.`when`(mockDetalhes.titular.cpf).thenReturn(cpf)
+        val instituicao = ClienteDetalhesInstituicao("NOME", "ISPB")
+        val titular = ClienteDetalhesTitular("ID", "NOME", cpf)
+        val detalhes = ClienteDetalhes(DEFAULT_TIPO_CONTA, instituicao, "AGENCIA", DEFAULT_NUMERO, titular)
+
+        Mockito.`when`(mockChaveClient.buscaDetalhes(Mockito.anyString(), MockitoHelper.anyObject()))
+            .thenReturn(detalhes)
 
         val request = requestBuilder
             .setTipoChave(TipoChave.CPF)
@@ -74,7 +84,12 @@ internal class TestaValidacaoConstraints {
     @ParameterizedTest
     @ValueSource(strings = ["12345678901", "01234567890", "10320064042", "42423029080"])
     fun `testa requisicao CPF valido`(cpf: String) {
-        Mockito.`when`(mockDetalhes.titular.cpf).thenReturn(cpf)
+        val instituicao = ClienteDetalhesInstituicao("NOME", "ISPB")
+        val titular = ClienteDetalhesTitular("ID", "NOME", cpf)
+        val detalhes = ClienteDetalhes(DEFAULT_TIPO_CONTA, instituicao, "AGENCIA", DEFAULT_NUMERO, titular)
+
+        Mockito.`when`(mockChaveClient.buscaDetalhes(Mockito.anyString(), MockitoHelper.anyObject()))
+            .thenReturn(detalhes)
 
         val request = requestBuilder
             .setTipoChave(TipoChave.CPF)
@@ -87,7 +102,12 @@ internal class TestaValidacaoConstraints {
     @ParameterizedTest
     @ValueSource(strings = ["12345678901", "01234567890", "10320064042", "42423029080"])
     fun `testa requisicao CPF ja existente`(cpf: String) {
-        Mockito.`when`(mockDetalhes.titular.cpf).thenReturn(cpf)
+        val instituicao = ClienteDetalhesInstituicao("NOME", "ISPB")
+        val titular = ClienteDetalhesTitular("ID", "NOME", cpf)
+        val detalhes = ClienteDetalhes(DEFAULT_TIPO_CONTA, instituicao, "AGENCIA", DEFAULT_NUMERO, titular)
+
+        Mockito.`when`(mockChaveClient.buscaDetalhes(Mockito.anyString(), MockitoHelper.anyObject()))
+            .thenReturn(detalhes)
 
         val request = requestBuilder
             .setTipoChave(TipoChave.CPF)
@@ -203,5 +223,10 @@ internal class TestaValidacaoConstraints {
     @MockBean(ChaveClient::class)
     fun chaveClient(): ChaveClient {
         return Mockito.mock(ChaveClient::class.java)
+    }
+
+    @MockBean(BcbClient::class)
+    fun bcbClient(): BcbClient {
+        return Mockito.mock(BcbClient::class.java)
     }
 }

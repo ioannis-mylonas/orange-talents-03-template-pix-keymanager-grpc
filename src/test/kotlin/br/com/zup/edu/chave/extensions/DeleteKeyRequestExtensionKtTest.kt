@@ -4,10 +4,12 @@ import br.com.zup.edu.DeleteKeyRequest
 import br.com.zup.edu.TipoChave
 import br.com.zup.edu.TipoConta
 import br.com.zup.edu.chave.ChavePix
+import br.com.zup.edu.chave.bcb.BcbClient
 import br.com.zup.edu.chave.cliente.ChaveClient
 import br.com.zup.edu.chave.cliente.ClienteDetalhesTitular
 import br.com.zup.edu.chave.exceptions.PixClientNotFoundException
 import io.micronaut.http.client.exceptions.HttpClientResponseException
+import io.micronaut.test.annotation.MockBean
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -94,5 +96,15 @@ internal class DeleteKeyRequestExtensionKtTest {
             .build()
 
         assertTrue(!request.isDono(chave, titular))
+    }
+
+    @MockBean(ChaveClient::class)
+    fun chaveClient(): ChaveClient {
+        return Mockito.mock(ChaveClient::class.java)
+    }
+
+    @MockBean(BcbClient::class)
+    fun bcbClient(): BcbClient {
+        return Mockito.mock(BcbClient::class.java)
     }
 }

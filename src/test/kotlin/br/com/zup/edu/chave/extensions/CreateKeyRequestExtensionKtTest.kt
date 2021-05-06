@@ -2,6 +2,7 @@ package br.com.zup.edu.chave.extensions
 
 import br.com.zup.edu.*
 import br.com.zup.edu.chave.ChavePixRepository
+import br.com.zup.edu.chave.bcb.BcbClient
 import br.com.zup.edu.chave.cliente.ChaveClient
 import br.com.zup.edu.chave.cliente.ClienteDetalhes
 import br.com.zup.edu.chave.cliente.ClienteDetalhesInstituicao
@@ -113,5 +114,10 @@ internal class CreateKeyRequestExtensionKtTest {
     @MockBean(ChaveClient::class)
     fun chaveClient(): ChaveClient {
         return Mockito.mock(ChaveClient::class.java)
+    }
+
+    @MockBean(BcbClient::class)
+    fun bcbClient(): BcbClient {
+        return Mockito.mock(BcbClient::class.java)
     }
 }
