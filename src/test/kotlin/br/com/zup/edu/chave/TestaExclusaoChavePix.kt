@@ -39,8 +39,7 @@ internal class TestaExclusaoChavePix {
             TipoConta.CONTA_CORRENTE)
 
         chave = repository.save(chave)
-        // Se mudar para count() == 1L o teste sempre falha no final
-        assertTrue(repository.findAll().size == 1)
+        assertTrue(repository.count() == 1L)
 
         val request = DeleteKeyRequest.newBuilder()
             .setId(chave.id)
@@ -48,9 +47,7 @@ internal class TestaExclusaoChavePix {
             .build()
 
         rpc.delete(request)
-        // Se mudar para findAll().size == 0 sempre falha
         assertTrue(repository.count() == 0L)
-        // TODO Consertar: O teste falha às vezes
     }
 
     @Test

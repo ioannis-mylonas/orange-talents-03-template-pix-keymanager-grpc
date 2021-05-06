@@ -38,7 +38,6 @@ class KeymanagerGRPCServer(
         responseObserver.onCompleted()
     }
 
-    @Transactional
     @ExceptionInterceptor
     override fun delete(request: DeleteKeyRequest, responseObserver: StreamObserver<DeleteKeyResponse>) {
         request.validaCliente(client)
