@@ -15,20 +15,6 @@ import io.micronaut.http.client.exceptions.HttpClientResponseException
 import java.util.*
 
 /**
- * Busca detalhes do cliente no ERP.
- * @param client Client para comunicação com o serviço.
- * @return Detalhes do cliente, se encontrado.
- * @throws PixClientNotFoundException Se não encontrado.
- */
-fun CreateKeyRequest.buscaDetalhesCliente(client: ChaveClient): ClienteDetalhes {
-    return try {
-        client.buscaDetalhes(idCliente, tipoConta)
-    } catch (e: HttpClientResponseException) {
-        throw PixClientNotFoundException(idCliente, tipoConta)
-    } ?: throw PixClientNotFoundException(idCliente, tipoConta)
-}
-
-/**
  * Valida a chave PIX conforme uma Collection de PixValidators.
  */
 fun CreateKeyRequest.valida(validators: Collection<PixValidator>) {

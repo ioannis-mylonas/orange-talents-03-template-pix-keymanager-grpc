@@ -13,6 +13,7 @@ service KeymanagerGRPCService {
   rpc cria (CreateKeyRequest) returns (CreateKeyResponse) {}
   rpc delete (DeleteKeyRequest) returns (DeleteKeyResponse) {}
   rpc get (GetKeyRequest) returns (GetKeyResponse) {}
+  rpc list (ListKeyRequest) returns (ListKeyResponse) {}
 }
 
 enum TipoChave {
@@ -71,4 +72,12 @@ message GetKeyResponse {
   Titular titular = 5;
   Instituicao instituicao = 6;
   string criadaEm = 7;
+}
+
+message ListKeyRequest {
+  string idCliente = 1;
+}
+
+message ListKeyResponse {
+  repeated GetKeyResponse chaves = 1;
 }

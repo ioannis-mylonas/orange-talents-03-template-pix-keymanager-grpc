@@ -20,6 +20,7 @@ interface ChavePixRepository: JpaRepository<ChavePix, Long> {
     fun existsByChave(chave: String): Boolean
     fun findByChave(chave: String): Optional<ChavePix>
     fun deleteByChave(chave: String)
+    fun findByCpf(cpf: String): Collection<ChavePix>
 }
 
 /**
@@ -78,11 +79,22 @@ fun ChavePixRepository.deleteBcb(chave: ChavePix, bcbClient: BcbClient) {
  */
 fun ChavePixRepository.findBcb(idChave: Long, bcbClient: BcbClient): ChavePix {
     val chave = findById(idChave).orElseThrow { PixChaveNotFound() }
-    try {
-        bcbClient.get(chave.chave)
-    } catch (e: HttpClientResponseException) {
-        throw PixChaveNotFound()
-    } ?: throw PixChaveNotFound()
+    if (!validaBcb(chave, bcbClient)) throw PixChaveNotFound()
 
     return chave
+}
+
+/**
+ * Valida se a chave está cadastrada no BCB.
+ * @param chave Chave a ser validada
+ * @param bcbClient Client para comunicação com o BCB.
+ * @return True se estiver cadastrada, false caso contrário.
+ */
+fun ChavePixRepository.validaBcb(chave: ChavePix, bcbClient: BcbClient): Boolean {
+    try {
+        bcbClient.get(chave.chave) ?: return false
+        return true
+    } catch (e: HttpClientResponseException) {
+        return false
+    }
 }

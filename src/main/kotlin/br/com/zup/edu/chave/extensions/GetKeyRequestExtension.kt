@@ -9,21 +9,6 @@ import br.com.zup.edu.chave.exceptions.PixClientNotFoundException
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 
 /**
- * Busca detalhes do cliente no ERP.
- * @param client Client para comunicação com o serviço.
- * @param tipoConta Tipo de conta a ser buscada.
- * @return Detalhes do cliente, se encontrado.
- * @throws PixClientNotFoundException Se não encontrado.
- */
-fun GetKeyRequest.buscaDetalhesCliente(client: ChaveClient, tipoConta: TipoConta): ClienteDetalhes {
-    return try {
-        client.buscaDetalhes(idCliente, tipoConta)
-    } catch (e: HttpClientResponseException) {
-        throw PixClientNotFoundException(idCliente, tipoConta)
-    } ?: throw PixClientNotFoundException(idCliente, tipoConta)
-}
-
-/**
  * Verifica se o cliente é dono da chave.
  * @param chave Chave PIX a ser verificada.
  * @param titular Titular a ser verificado.
