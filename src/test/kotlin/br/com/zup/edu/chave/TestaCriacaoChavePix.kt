@@ -32,7 +32,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @MicronautTest(transactional = false, rollback = false)
-internal class TestaValidacaoConstraints {
+internal class TestaCriacaoChavePix {
     @Inject lateinit var client: KeymanagerGRPCServiceGrpc.KeymanagerGRPCServiceBlockingStub
     @Inject lateinit var repository: ChavePixRepository
     @Inject lateinit var mockChaveClient: ChaveClient
