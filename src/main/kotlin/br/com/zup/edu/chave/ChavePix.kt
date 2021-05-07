@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull
 import javax.validation.constraints.Size
 
 @Entity
-data class ChavePix(
+class ChavePix(
     @field:Enumerated(EnumType.STRING) @field:NotNull val tipoChave: TipoChave,
     @field:NotBlank @field:Size(max = 77) val chave: String,
     @field:Enumerated(EnumType.STRING) @field:NotNull val tipoConta: TipoConta,

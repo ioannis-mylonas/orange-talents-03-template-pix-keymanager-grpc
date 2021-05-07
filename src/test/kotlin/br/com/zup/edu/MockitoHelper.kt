@@ -9,4 +9,6 @@ object MockitoHelper {
     }
     @Suppress("UNCHECKED_CAST")
     fun <T> uninitialized(): T =  null as T
+
+    fun <T> eq(obj: T): T = Mockito.eq<T>(obj)
 }
