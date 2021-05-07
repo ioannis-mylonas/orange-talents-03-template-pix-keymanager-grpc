@@ -11,7 +11,7 @@ import javax.validation.constraints.Size
 
 @Singleton
 @Open
-class EmailPixValidator(@Inject val validator: Validator): PixValidator {
+class EmailPixValidator: PixValidator {
     override fun shouldValidate(chave: String?, tipo: TipoChave): Boolean {
         return tipo == TipoChave.EMAIL
     }

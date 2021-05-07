@@ -11,7 +11,7 @@ import javax.validation.constraints.Size
 
 @Singleton
 @Open
-class CelularPixValidator(@Inject val validator: Validator): PixValidator {
+class CelularPixValidator: PixValidator {
     override fun shouldValidate(chave: String?, tipo: TipoChave): Boolean {
         return tipo == TipoChave.PHONE
     }
