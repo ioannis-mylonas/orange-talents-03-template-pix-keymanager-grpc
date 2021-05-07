@@ -9,11 +9,8 @@ import br.com.zup.edu.chave.cliente.ClienteDetalhesInstituicao
 import br.com.zup.edu.chave.cliente.ClienteDetalhesTitular
 import br.com.zup.edu.chave.exceptions.PixClientNotFoundException
 import br.com.zup.edu.chave.exceptions.PixPermissionDeniedException
-import io.grpc.ManagedChannel
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
-import io.micronaut.grpc.annotation.GrpcChannel
-import io.micronaut.grpc.server.GrpcServerChannel
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.test.annotation.MockBean
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
@@ -24,7 +21,6 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import java.util.*
 import javax.inject.Inject
-import javax.inject.Singleton
 
 @MicronautTest(transactional = false, rollback = false)
 internal class CreateKeyRequestExtensionKtTest {
@@ -55,7 +51,8 @@ internal class CreateKeyRequestExtensionKtTest {
             .thenReturn(null)
 
         assertThrows(PixClientNotFoundException::class.java) {
-            request.validateDadosClientes(mockChaveClient)
+            val detalhes = request.buscaDetalhesCliente(mockChaveClient)
+            request.validaDadosClientes(detalhes)
         }
     }
 
@@ -65,7 +62,8 @@ internal class CreateKeyRequestExtensionKtTest {
             .thenThrow(HttpClientResponseException::class.java)
 
         assertThrows(PixClientNotFoundException::class.java) {
-            request.validateDadosClientes(mockChaveClient)
+            val detalhes = request.buscaDetalhesCliente(mockChaveClient)
+            request.validaDadosClientes(detalhes)
         }
     }
 
@@ -79,7 +77,8 @@ internal class CreateKeyRequestExtensionKtTest {
             .thenReturn(detalhes)
 
         assertThrows(PixPermissionDeniedException::class.java) {
-            request.validateDadosClientes(mockChaveClient)
+            val result = request.buscaDetalhesCliente(mockChaveClient)
+            request.validaDadosClientes(result)
         }
     }
 

@@ -10,9 +10,10 @@ import io.micronaut.http.client.exceptions.HttpClientResponseException
 /**
  * Busca cliente no ERP, por número.
  * @param client Um client para consulta no ERP.
+ * @return Titular, conforme consultado.
  * @throws PixClientNotFoundException Se o cliente não for encontrado.
  */
-fun DeleteKeyRequest.validaCliente(client: ChaveClient): ClienteDetalhesTitular {
+fun DeleteKeyRequest.buscaTitular(client: ChaveClient): ClienteDetalhesTitular {
     val cliente = try {
         client.buscaCliente(numero)
     } catch (e: HttpClientResponseException) { null }

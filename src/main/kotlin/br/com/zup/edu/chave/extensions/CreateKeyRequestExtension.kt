@@ -15,6 +15,20 @@ import io.micronaut.http.client.exceptions.HttpClientResponseException
 import java.util.*
 
 /**
+ * Busca detalhes do cliente no ERP.
+ * @param client Client para comunicação com o serviço.
+ * @return Detalhes do cliente, se encontrado.
+ * @throws PixClientNotFoundException Se não encontrado.
+ */
+fun CreateKeyRequest.buscaDetalhesCliente(client: ChaveClient): ClienteDetalhes {
+    return try {
+        client.buscaDetalhes(numero, tipoConta)
+    } catch (e: HttpClientResponseException) {
+        throw PixClientNotFoundException(numero, tipoConta)
+    } ?: throw PixClientNotFoundException(numero, tipoConta)
+}
+
+/**
  * Converte a request para o model, para ser persistido no banco de dados.
  * @return ChavePix com os dados especificados, pronta para ser persistida.
  */
@@ -25,7 +39,7 @@ fun CreateKeyRequest.toModel(detalhes: ClienteDetalhes, chave: String): ChavePix
 /**
  * Valida a chave PIX conforme uma Collection de PixValidators.
  */
-fun CreateKeyRequest.validate(validators: Collection<PixValidator>) {
+fun CreateKeyRequest.valida(validators: Collection<PixValidator>) {
     validators.forEach {
         it.validate(chave, tipoChave)
     }
@@ -35,7 +49,7 @@ fun CreateKeyRequest.validate(validators: Collection<PixValidator>) {
  * Valida se a chave PIX especificada é única.
  * @throws PixAlreadyExistsException Se a chave já existir no banco de dados.
  */
-fun CreateKeyRequest.validateUniqueness(repository: ChavePixRepository) {
+fun CreateKeyRequest.validaUniqueness(repository: ChavePixRepository) {
     if (repository.existsByChave(chave)) {
         throw PixAlreadyExistsException()
     }
@@ -43,20 +57,11 @@ fun CreateKeyRequest.validateUniqueness(repository: ChavePixRepository) {
 
 /**
  * Valida dados do cliente conforme ERP.
- * @param client Uma instância de HTTP client que possa fazer a requisição ao ERP.
- * @throws PixClientNotFoundException Se o número ou tipo de conta não for encontrado.
+ * @param detalhes Detalhes do cliente a serem validados.
  * @throws PixPermissionDeniedException Se o CPF não bater com o cadastro no ERP.
  */
-fun CreateKeyRequest.validateDadosClientes(client: ChaveClient): ClienteDetalhes {
-    val detalhes = try {
-        client.buscaDetalhes(numero, tipoConta)
-    } catch (e: HttpClientResponseException) {
-        throw PixClientNotFoundException(numero, tipoConta)
-    } ?: throw PixClientNotFoundException(numero, tipoConta)
-
+fun CreateKeyRequest.validaDadosClientes(detalhes: ClienteDetalhes) {
     if (tipoChave == TipoChave.CPF && chave != detalhes.titular.cpf) {
         throw PixClientWrongCpfException()
     }
-
-    return detalhes
 }

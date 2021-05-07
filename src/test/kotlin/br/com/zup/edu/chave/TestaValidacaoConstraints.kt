@@ -1,7 +1,9 @@
 package br.com.zup.edu.chave
 
 import br.com.zup.edu.*
+import br.com.zup.edu.chave.bcb.BcbAccountType
 import br.com.zup.edu.chave.bcb.BcbClient
+import br.com.zup.edu.chave.bcb.BcbCreatePixKeyResponse
 import br.com.zup.edu.chave.cliente.ChaveClient
 import br.com.zup.edu.chave.cliente.ClienteDetalhes
 import br.com.zup.edu.chave.cliente.ClienteDetalhesInstituicao
@@ -50,10 +52,16 @@ internal class TestaValidacaoConstraints {
     private val titular = ClienteDetalhesTitular("ID", "NOME", DEFAULT_NUMERO)
     private val detalhes = ClienteDetalhes(DEFAULT_TIPO_CONTA, instituicao, "AGENCIA", DEFAULT_NUMERO, titular)
 
+    private val mockResponse = Mockito.mock(BcbCreatePixKeyResponse::class.java, Mockito.RETURNS_DEEP_STUBS)
+
     @BeforeEach
     fun setup() {
         Mockito.`when`(mockChaveClient.buscaDetalhes(Mockito.anyString(), MockitoHelper.anyObject()))
             .thenReturn(detalhes)
+
+        Mockito.`when`(mockBcbClient.cadastra(MockitoHelper.anyObject())).thenReturn(mockResponse)
+        Mockito.`when`(mockResponse.owner.taxIdNumber).thenReturn(DEFAULT_NUMERO)
+        Mockito.`when`(mockResponse.bankAccount.accountType).thenReturn(BcbAccountType.CACC)
     }
 
     @AfterEach
@@ -71,7 +79,8 @@ internal class TestaValidacaoConstraints {
 
         Mockito.`when`(mockChaveClient.buscaDetalhes(Mockito.anyString(), MockitoHelper.anyObject()))
             .thenReturn(detalhes)
-        Mockito.`when`(mockBcbClient.cadastra(MockitoHelper.anyObject()).key).thenReturn(cpf)
+        Mockito.`when`(mockResponse.key).thenReturn(cpf)
+        Mockito.`when`(mockResponse.keyType).thenReturn(TipoChave.CPF)
 
         val request = requestBuilder
             .setTipoChave(TipoChave.CPF)
@@ -94,7 +103,8 @@ internal class TestaValidacaoConstraints {
 
         Mockito.`when`(mockChaveClient.buscaDetalhes(Mockito.anyString(), MockitoHelper.anyObject()))
             .thenReturn(detalhes)
-        Mockito.`when`(mockBcbClient.cadastra(MockitoHelper.anyObject()).key).thenReturn(cpf)
+        Mockito.`when`(mockResponse.key).thenReturn(cpf)
+        Mockito.`when`(mockResponse.keyType).thenReturn(TipoChave.CPF)
 
         val request = requestBuilder
             .setTipoChave(TipoChave.CPF)
@@ -113,7 +123,8 @@ internal class TestaValidacaoConstraints {
 
         Mockito.`when`(mockChaveClient.buscaDetalhes(Mockito.anyString(), MockitoHelper.anyObject()))
             .thenReturn(detalhes)
-        Mockito.`when`(mockBcbClient.cadastra(MockitoHelper.anyObject()).key).thenReturn(cpf)
+        Mockito.`when`(mockResponse.key).thenReturn(cpf)
+        Mockito.`when`(mockResponse.keyType).thenReturn(TipoChave.CPF)
 
         val request = requestBuilder
             .setTipoChave(TipoChave.CPF)
@@ -164,7 +175,8 @@ internal class TestaValidacaoConstraints {
             .setChave(email)
             .build()
 
-        Mockito.`when`(mockBcbClient.cadastra(MockitoHelper.anyObject()).key).thenReturn(email)
+        Mockito.`when`(mockResponse.key).thenReturn(email)
+        Mockito.`when`(mockResponse.keyType).thenReturn(TipoChave.EMAIL)
         val erro = assertThrows(StatusRuntimeException::class.java) {
             client.cria(request)
         }
@@ -180,7 +192,8 @@ internal class TestaValidacaoConstraints {
             .setChave(email)
             .build()
 
-        Mockito.`when`(mockBcbClient.cadastra(MockitoHelper.anyObject()).key).thenReturn(email)
+        Mockito.`when`(mockResponse.key).thenReturn(email)
+        Mockito.`when`(mockResponse.keyType).thenReturn(TipoChave.EMAIL)
         client.cria(request)
     }
 
@@ -193,7 +206,8 @@ internal class TestaValidacaoConstraints {
             .setChave(celular)
             .build()
 
-        Mockito.`when`(mockBcbClient.cadastra(MockitoHelper.anyObject()).key).thenReturn(celular)
+        Mockito.`when`(mockResponse.key).thenReturn(celular)
+        Mockito.`when`(mockResponse.keyType).thenReturn(TipoChave.PHONE)
         val erro = assertThrows(StatusRuntimeException::class.java) {
             client.cria(request)
         }
@@ -209,7 +223,8 @@ internal class TestaValidacaoConstraints {
             .setChave(celular)
             .build()
 
-        Mockito.`when`(mockBcbClient.cadastra(MockitoHelper.anyObject()).key).thenReturn(celular)
+        Mockito.`when`(mockResponse.key).thenReturn(celular)
+        Mockito.`when`(mockResponse.keyType).thenReturn(TipoChave.PHONE)
         client.cria(request)
     }
 
@@ -221,7 +236,8 @@ internal class TestaValidacaoConstraints {
             .setChave(celular)
             .build()
 
-        Mockito.`when`(mockBcbClient.cadastra(MockitoHelper.anyObject()).key).thenReturn(celular)
+        Mockito.`when`(mockResponse.key).thenReturn(celular)
+        Mockito.`when`(mockResponse.keyType).thenReturn(TipoChave.PHONE)
         client.cria(request)
 
         val erro = assertThrows(StatusRuntimeException::class.java) {
@@ -239,7 +255,8 @@ internal class TestaValidacaoConstraints {
             .setChave(aleatorio)
             .build()
 
-        Mockito.`when`(mockBcbClient.cadastra(MockitoHelper.anyObject()).key).thenReturn(aleatorio)
+        Mockito.`when`(mockResponse.key).thenReturn(aleatorio)
+        Mockito.`when`(mockResponse.keyType).thenReturn(TipoChave.RANDOM)
         val erro = assertThrows(StatusRuntimeException::class.java) {
             client.cria(request)
         }
@@ -255,8 +272,8 @@ internal class TestaValidacaoConstraints {
             .setChave(aleatorio)
             .build()
 
-        Mockito.`when`(mockBcbClient.cadastra(MockitoHelper.anyObject()).key)
-            .thenReturn(UUID.randomUUID().toString())
+        Mockito.`when`(mockResponse.key).thenReturn(UUID.randomUUID().toString())
+        Mockito.`when`(mockResponse.keyType).thenReturn(TipoChave.RANDOM)
         client.cria(request)
     }
 

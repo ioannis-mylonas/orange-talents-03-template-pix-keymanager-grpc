@@ -33,7 +33,7 @@ internal class DeleteKeyRequestExtensionKtTest {
             .build()
 
         assertThrows(PixClientNotFoundException::class.java) {
-            request.validaCliente(client)
+            request.buscaTitular(client)
         }
     }
 
@@ -48,7 +48,7 @@ internal class DeleteKeyRequestExtensionKtTest {
             .build()
 
         assertThrows(PixClientNotFoundException::class.java) {
-            request.validaCliente(client)
+            request.buscaTitular(client)
         }
     }
 
