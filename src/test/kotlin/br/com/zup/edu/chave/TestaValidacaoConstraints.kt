@@ -26,6 +26,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EmptySource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito
+import java.time.LocalDateTime
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -43,7 +44,7 @@ internal class TestaValidacaoConstraints {
     private val DEFAULT_CHAVE = "12345678901"
 
     private val requestBuilder = CreateKeyRequest.newBuilder()
-        .setNumero(DEFAULT_NUMERO)
+        .setIdCliente(DEFAULT_NUMERO)
         .setTipoConta(DEFAULT_TIPO_CONTA)
         .setTipoChave(DEFAULT_TIPO_CHAVE)
         .setChave(DEFAULT_CHAVE)
@@ -62,6 +63,7 @@ internal class TestaValidacaoConstraints {
         Mockito.`when`(mockBcbClient.cadastra(MockitoHelper.anyObject())).thenReturn(mockResponse)
         Mockito.`when`(mockResponse.owner.taxIdNumber).thenReturn(DEFAULT_NUMERO)
         Mockito.`when`(mockResponse.bankAccount.accountType).thenReturn(BcbAccountType.CACC)
+        Mockito.`when`(mockResponse.createdAt).thenReturn(LocalDateTime.now())
     }
 
     @AfterEach

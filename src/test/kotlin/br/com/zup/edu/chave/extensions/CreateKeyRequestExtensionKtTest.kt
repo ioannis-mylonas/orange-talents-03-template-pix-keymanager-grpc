@@ -36,7 +36,7 @@ internal class CreateKeyRequestExtensionKtTest {
     private val request = CreateKeyRequest.newBuilder()
         .setChave(DEFAULT_CHAVE)
         .setTipoChave(DEFAULT_TIPO_CHAVE)
-        .setNumero(DEFAULT_NUMERO)
+        .setIdCliente(DEFAULT_NUMERO)
         .setTipoConta(DEFAULT_TIPO_CONTA)
         .build()
 

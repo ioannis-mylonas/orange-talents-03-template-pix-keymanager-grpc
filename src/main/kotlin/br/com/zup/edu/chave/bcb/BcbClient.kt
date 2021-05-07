@@ -14,4 +14,7 @@ interface BcbClient {
 
     @Get(value = "/api/v1/pix/keys", consumes = ["application/xml"], produces = ["application/xml"])
     fun lista(): BcbKeyDetailsList
+
+    @Get(value = "/api/v1/pix/keys/{key}", consumes = ["application/xml"], produces = ["application/xml"])
+    fun get(@QueryValue key: String): BcbKeyDetails?
 }

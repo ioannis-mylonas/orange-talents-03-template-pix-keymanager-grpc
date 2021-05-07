@@ -12,6 +12,7 @@ import io.micronaut.data.annotation.Repository
 import io.micronaut.data.jpa.repository.JpaRepository
 import io.micronaut.http.HttpStatus
 import io.micronaut.http.client.exceptions.HttpClientResponseException
+import java.net.http.HttpClient
 import java.util.*
 
 @Repository
@@ -36,7 +37,8 @@ fun ChavePixRepository.saveBcb(input: CreateKeyRequest, detalhes: ClienteDetalhe
         val chave = ChavePix(response.keyType,
             response.key,
             response.bankAccount.accountType.toTipoConta(),
-            response.owner.taxIdNumber)
+            response.owner.taxIdNumber,
+            response.createdAt)
 
         return save(chave)
     } catch (e: HttpClientResponseException) {
@@ -65,4 +67,22 @@ fun ChavePixRepository.deleteBcb(chave: ChavePix, bcbClient: BcbClient) {
             else -> throw e
         }
     }
+}
+
+/**
+ * Retorna a chave se ela estiver também cadastrada no BCB.
+ * @param idChave PIX ID.
+ * @param bcbClient Client para comunicação com o BCB.
+ * @return Chave PIX, existir.
+ * @throws PixChaveNotFound Se a chave PIX não existir ou não estiver cadastrada no BCB.
+ */
+fun ChavePixRepository.findBcb(idChave: Long, bcbClient: BcbClient): ChavePix {
+    val chave = findById(idChave).orElseThrow { PixChaveNotFound() }
+    try {
+        bcbClient.get(chave.chave)
+    } catch (e: HttpClientResponseException) {
+        throw PixChaveNotFound()
+    } ?: throw PixChaveNotFound()
+
+    return chave
 }

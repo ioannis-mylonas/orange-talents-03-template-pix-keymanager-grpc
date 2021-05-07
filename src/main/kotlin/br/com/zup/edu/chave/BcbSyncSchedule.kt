@@ -37,7 +37,7 @@ class BcbSyncSchedule(
 
             if (key.isEmpty) {
                 val target = ChavePix(it.keyType,
-                    it.key, it.bankAccount.accountType.toTipoConta(), it.owner.taxIdNumber)
+                    it.key, it.bankAccount.accountType.toTipoConta(), it.owner.taxIdNumber, it.createdAt)
                 repository.save(target)
             }
         }

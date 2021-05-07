@@ -7,6 +7,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.time.LocalDateTime
 import java.util.*
 import javax.inject.Inject
 
@@ -16,7 +17,7 @@ internal class ChavePixRepositoryTest {
 
     private val valor = UUID.randomUUID().toString()
     private val chave = ChavePix(TipoChave.RANDOM, valor,
-        TipoConta.CONTA_CORRENTE, UUID.randomUUID().toString())
+        TipoConta.CONTA_CORRENTE, UUID.randomUUID().toString(), LocalDateTime.now())
 
     @BeforeEach
     fun setup() {

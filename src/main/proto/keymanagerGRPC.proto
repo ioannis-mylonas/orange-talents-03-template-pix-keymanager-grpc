@@ -7,9 +7,12 @@ option objc_class_prefix = "HLW";
 
 package br.com.zup.edu;
 
+import "google/protobuf/timestamp.proto";
+
 service KeymanagerGRPCService {
   rpc cria (CreateKeyRequest) returns (CreateKeyResponse) {}
   rpc delete (DeleteKeyRequest) returns (DeleteKeyResponse) {}
+  rpc get (GetKeyRequest) returns (GetKeyResponse) {}
 }
 
 enum TipoChave {
@@ -26,19 +29,46 @@ enum TipoConta {
 }
 
 message CreateKeyRequest {
-  string numero = 1;
+  string idCliente = 1;
   TipoChave tipoChave = 2;
   string chave = 3;
   TipoConta tipoConta = 4;
 }
 
 message CreateKeyResponse {
-  int64 id = 1;
+  int64 idPix = 1;
 }
 
 message DeleteKeyRequest {
-  int64 id = 1;
-  string numero = 2;
+  int64 idPix = 1;
+  string idCliente = 2;
 }
 
 message DeleteKeyResponse {}
+
+message GetKeyRequest {
+  string idCliente = 1;
+  int64 idPix = 2;
+}
+
+message GetKeyResponse {
+  message Titular {
+    string nome = 1;
+    string cpf = 2;
+  }
+
+  message Instituicao {
+    string nome = 1;
+    string agencia = 2;
+    string conta = 3;
+    TipoConta tipoConta = 4;
+  }
+
+  int64 idPix = 1;
+  string idCliente = 2;
+  TipoChave tipoChave = 3;
+  string chave = 4;
+  Titular titular = 5;
+  Instituicao instituicao = 6;
+  string criadaEm = 7;
+}

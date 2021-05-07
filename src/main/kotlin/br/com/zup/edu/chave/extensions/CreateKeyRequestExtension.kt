@@ -22,18 +22,10 @@ import java.util.*
  */
 fun CreateKeyRequest.buscaDetalhesCliente(client: ChaveClient): ClienteDetalhes {
     return try {
-        client.buscaDetalhes(numero, tipoConta)
+        client.buscaDetalhes(idCliente, tipoConta)
     } catch (e: HttpClientResponseException) {
-        throw PixClientNotFoundException(numero, tipoConta)
-    } ?: throw PixClientNotFoundException(numero, tipoConta)
-}
-
-/**
- * Converte a request para o model, para ser persistido no banco de dados.
- * @return ChavePix com os dados especificados, pronta para ser persistida.
- */
-fun CreateKeyRequest.toModel(detalhes: ClienteDetalhes, chave: String): ChavePix {
-    return ChavePix(tipoChave, chave, tipoConta, detalhes.titular.cpf)
+        throw PixClientNotFoundException(idCliente, tipoConta)
+    } ?: throw PixClientNotFoundException(idCliente, tipoConta)
 }
 
 /**

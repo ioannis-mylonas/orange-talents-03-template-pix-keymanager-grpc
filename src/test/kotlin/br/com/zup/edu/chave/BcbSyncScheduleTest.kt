@@ -56,7 +56,7 @@ internal class BcbSyncScheduleTest {
         val chave = ChavePix(TipoChave.RANDOM,
             UUID.randomUUID().toString(),
             TipoConta.CONTA_CORRENTE,
-            UUID.randomUUID().toString())
+            UUID.randomUUID().toString(), LocalDateTime.now())
 
         repository.save(chave)
         assertEquals(1L, repository.count())

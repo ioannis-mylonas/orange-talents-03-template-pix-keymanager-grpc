@@ -15,6 +15,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
+import java.time.LocalDateTime
 import java.util.*
 import javax.inject.Inject
 import kotlin.random.Random
@@ -40,14 +41,14 @@ internal class TestaExclusaoChavePix {
 
         var chave = ChavePix(TipoChave.RANDOM,
             UUID.randomUUID().toString(),
-            TipoConta.CONTA_CORRENTE, titular.cpf)
+            TipoConta.CONTA_CORRENTE, titular.cpf, LocalDateTime.now())
 
         chave = repository.save(chave)
         assertTrue(repository.count() == 1L)
 
         val request = DeleteKeyRequest.newBuilder()
-            .setId(chave.id)
-            .setNumero(titular.id)
+            .setIdPix(chave.id)
+            .setIdCliente(titular.id)
             .build()
 
         rpc.delete(request)
@@ -61,14 +62,14 @@ internal class TestaExclusaoChavePix {
 
         var chave = ChavePix(TipoChave.RANDOM,
             UUID.randomUUID().toString(),
-            TipoConta.CONTA_CORRENTE, titular.cpf)
+            TipoConta.CONTA_CORRENTE, titular.cpf, LocalDateTime.now())
 
         chave = repository.save(chave)
         assertTrue(repository.count() == 1L)
 
         val request = DeleteKeyRequest.newBuilder()
-            .setId(chave.id)
-            .setNumero(titular.id)
+            .setIdPix(chave.id)
+            .setIdCliente(titular.id)
             .build()
 
         Mockito.`when`(bcbClient.deleta(Mockito.anyString(), MockitoHelper.anyObject()))
@@ -88,14 +89,14 @@ internal class TestaExclusaoChavePix {
 
         var chave = ChavePix(TipoChave.RANDOM,
             UUID.randomUUID().toString(),
-            TipoConta.CONTA_CORRENTE, UUID.randomUUID().toString())
+            TipoConta.CONTA_CORRENTE, UUID.randomUUID().toString(), LocalDateTime.now())
 
         chave = repository.save(chave)
         assertTrue(repository.count() == 1L)
 
         val request = DeleteKeyRequest.newBuilder()
-            .setId(chave.id)
-            .setNumero(titular.id)
+            .setIdPix(chave.id)
+            .setIdCliente(titular.id)
             .build()
 
         val erro = assertThrows(StatusRuntimeException::class.java) {
@@ -113,7 +114,7 @@ internal class TestaExclusaoChavePix {
 
         var chave = ChavePix(TipoChave.RANDOM,
             UUID.randomUUID().toString(),
-            TipoConta.CONTA_CORRENTE, cpf)
+            TipoConta.CONTA_CORRENTE, cpf, LocalDateTime.now())
 
         chave = repository.save(chave)
         assertTrue(repository.count() == 1L)
@@ -122,8 +123,8 @@ internal class TestaExclusaoChavePix {
             .thenThrow(HttpClientResponseException("", HttpResponse.status<Any>(HttpStatus.FORBIDDEN)))
 
         val request = DeleteKeyRequest.newBuilder()
-            .setId(chave.id)
-            .setNumero(titular.id)
+            .setIdPix(chave.id)
+            .setIdCliente(titular.id)
             .build()
 
         val erro = assertThrows(StatusRuntimeException::class.java) {
@@ -141,8 +142,8 @@ internal class TestaExclusaoChavePix {
         assertTrue(repository.count() == 0L)
 
         val request = DeleteKeyRequest.newBuilder()
-            .setId(Random.nextLong())
-            .setNumero(titular.id)
+            .setIdPix(Random.nextLong())
+            .setIdCliente(titular.id)
             .build()
 
         val erro = assertThrows(StatusRuntimeException::class.java) {

@@ -14,6 +14,7 @@ import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
+import java.time.LocalDateTime
 import java.util.*
 import kotlin.random.Random
 
@@ -28,8 +29,8 @@ internal class DeleteKeyRequestExtensionKtTest {
     fun `testa nao encontra cliente no erp`() {
         Mockito.`when`(client.buscaCliente(Mockito.anyString())).thenReturn(null)
         val request = DeleteKeyRequest.newBuilder()
-            .setId(DEFAULT_ID)
-            .setNumero(DEFAULT_NUMERO)
+            .setIdPix(DEFAULT_ID)
+            .setIdCliente(DEFAULT_NUMERO)
             .build()
 
         assertThrows(PixClientNotFoundException::class.java) {
@@ -43,8 +44,8 @@ internal class DeleteKeyRequestExtensionKtTest {
             .thenThrow(HttpClientResponseException::class.java)
 
         val request = DeleteKeyRequest.newBuilder()
-            .setId(DEFAULT_ID)
-            .setNumero(DEFAULT_NUMERO)
+            .setIdPix(DEFAULT_ID)
+            .setIdCliente(DEFAULT_NUMERO)
             .build()
 
         assertThrows(PixClientNotFoundException::class.java) {
@@ -58,11 +59,11 @@ internal class DeleteKeyRequestExtensionKtTest {
         val key = UUID.randomUUID().toString()
 
         val titular = ClienteDetalhesTitular("ID", "NOME", cpf)
-        val chave = ChavePix(TipoChave.RANDOM, key, TipoConta.CONTA_CORRENTE, cpf)
+        val chave = ChavePix(TipoChave.RANDOM, key, TipoConta.CONTA_CORRENTE, cpf, LocalDateTime.now())
         val request = DeleteKeyRequest
             .newBuilder()
-            .setNumero(cpf)
-            .setId(chave.id)
+            .setIdCliente(cpf)
+            .setIdPix(chave.id)
             .build()
 
         assertTrue(request.isDono(chave, titular))
@@ -74,10 +75,10 @@ internal class DeleteKeyRequestExtensionKtTest {
         val key = UUID.randomUUID().toString()
 
         val titular = ClienteDetalhesTitular("ID", "NOME", UUID.randomUUID().toString())
-        val chave = ChavePix(TipoChave.RANDOM, key, TipoConta.CONTA_CORRENTE, cpf)
+        val chave = ChavePix(TipoChave.RANDOM, key, TipoConta.CONTA_CORRENTE, cpf, LocalDateTime.now())
         val request = DeleteKeyRequest.newBuilder()
-            .setNumero(UUID.randomUUID().toString())
-            .setId(chave.id)
+            .setIdCliente(UUID.randomUUID().toString())
+            .setIdPix(chave.id)
             .build()
 
         assertTrue(!request.isDono(chave, titular))
@@ -89,10 +90,10 @@ internal class DeleteKeyRequestExtensionKtTest {
         val key = UUID.randomUUID().toString()
 
         val titular = ClienteDetalhesTitular("ID", "NOME", cpf)
-        val chave = ChavePix(TipoChave.RANDOM, key, TipoConta.CONTA_CORRENTE, cpf)
+        val chave = ChavePix(TipoChave.RANDOM, key, TipoConta.CONTA_CORRENTE, cpf, LocalDateTime.now())
         val request = DeleteKeyRequest.newBuilder()
-            .setNumero(cpf)
-            .setId(Random.nextLong())
+            .setIdCliente(cpf)
+            .setIdPix(Random.nextLong())
             .build()
 
         assertTrue(!request.isDono(chave, titular))

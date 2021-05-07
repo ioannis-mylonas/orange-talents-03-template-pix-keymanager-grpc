@@ -15,10 +15,10 @@ import io.micronaut.http.client.exceptions.HttpClientResponseException
  */
 fun DeleteKeyRequest.buscaTitular(client: ChaveClient): ClienteDetalhesTitular {
     val cliente = try {
-        client.buscaCliente(numero)
+        client.buscaCliente(idCliente)
     } catch (e: HttpClientResponseException) { null }
 
-    cliente ?: throw PixClientNotFoundException(numero)
+    cliente ?: throw PixClientNotFoundException(idCliente)
     return cliente
 }
 
@@ -29,5 +29,5 @@ fun DeleteKeyRequest.buscaTitular(client: ChaveClient): ClienteDetalhesTitular {
  */
 fun DeleteKeyRequest.isDono(chave: ChavePix, titular: ClienteDetalhesTitular): Boolean {
     return (titular.cpf == chave.cpf &&
-            chave.id == id)
+            chave.id == idPix)
 }
