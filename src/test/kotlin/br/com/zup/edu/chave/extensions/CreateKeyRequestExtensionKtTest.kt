@@ -3,10 +3,7 @@ package br.com.zup.edu.chave.extensions
 import br.com.zup.edu.*
 import br.com.zup.edu.chave.ChavePixRepository
 import br.com.zup.edu.chave.bcb.BcbClient
-import br.com.zup.edu.chave.cliente.ChaveClient
-import br.com.zup.edu.chave.cliente.ClienteDetalhes
-import br.com.zup.edu.chave.cliente.ClienteDetalhesInstituicao
-import br.com.zup.edu.chave.cliente.ClienteDetalhesTitular
+import br.com.zup.edu.chave.cliente.*
 import br.com.zup.edu.chave.exceptions.PixClientNotFoundException
 import br.com.zup.edu.chave.exceptions.PixPermissionDeniedException
 import io.grpc.Status
@@ -27,6 +24,7 @@ internal class CreateKeyRequestExtensionKtTest {
     @Inject lateinit var mockChaveClient: ChaveClient
     @Inject lateinit var client: KeymanagerGRPCServiceGrpc.KeymanagerGRPCServiceBlockingStub
     @Inject lateinit var repository: ChavePixRepository
+    @Inject lateinit var buscaCliente: BuscaClienteDetalhes
 
     private val DEFAULT_NUMERO = UUID.randomUUID().toString()
     private val DEFAULT_TIPO_CONTA = TipoConta.CONTA_CORRENTE
@@ -51,7 +49,7 @@ internal class CreateKeyRequestExtensionKtTest {
             .thenReturn(null)
 
         assertThrows(PixClientNotFoundException::class.java) {
-            val detalhes = request.buscaDetalhesCliente(mockChaveClient)
+            val detalhes = buscaCliente.buscaDetalhesCliente(request.idCliente, request.tipoConta)
             request.validaDadosClientes(detalhes)
         }
     }
@@ -62,7 +60,7 @@ internal class CreateKeyRequestExtensionKtTest {
             .thenThrow(HttpClientResponseException::class.java)
 
         assertThrows(PixClientNotFoundException::class.java) {
-            val detalhes = request.buscaDetalhesCliente(mockChaveClient)
+            val detalhes = buscaCliente.buscaDetalhesCliente(request.idCliente, request.tipoConta)
             request.validaDadosClientes(detalhes)
         }
     }
@@ -77,7 +75,7 @@ internal class CreateKeyRequestExtensionKtTest {
             .thenReturn(detalhes)
 
         assertThrows(PixPermissionDeniedException::class.java) {
-            val result = request.buscaDetalhesCliente(mockChaveClient)
+            val result = buscaCliente.buscaDetalhesCliente(request.idCliente, request.tipoConta)
             request.validaDadosClientes(result)
         }
     }

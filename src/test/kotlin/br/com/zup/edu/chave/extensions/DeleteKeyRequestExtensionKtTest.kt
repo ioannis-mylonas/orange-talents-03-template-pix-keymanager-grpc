@@ -5,6 +5,7 @@ import br.com.zup.edu.TipoChave
 import br.com.zup.edu.TipoConta
 import br.com.zup.edu.chave.ChavePix
 import br.com.zup.edu.chave.bcb.BcbClient
+import br.com.zup.edu.chave.cliente.BuscaClienteDetalhes
 import br.com.zup.edu.chave.cliente.ChaveClient
 import br.com.zup.edu.chave.cliente.ClienteDetalhesTitular
 import br.com.zup.edu.chave.exceptions.PixClientNotFoundException
@@ -16,11 +17,13 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import java.time.LocalDateTime
 import java.util.*
+import javax.inject.Inject
 import kotlin.random.Random
 
 @MicronautTest(transactional = false, rollback = false)
 internal class DeleteKeyRequestExtensionKtTest {
     private val client: ChaveClient = Mockito.mock(ChaveClient::class.java)
+    @Inject lateinit var buscaCliente: BuscaClienteDetalhes
 
     private val DEFAULT_NUMERO = UUID.randomUUID().toString()
     private val DEFAULT_ID = 1L
@@ -34,7 +37,7 @@ internal class DeleteKeyRequestExtensionKtTest {
             .build()
 
         assertThrows(PixClientNotFoundException::class.java) {
-            request.buscaTitular(client)
+            buscaCliente.buscaTitular(request.idCliente)
         }
     }
 
@@ -49,7 +52,7 @@ internal class DeleteKeyRequestExtensionKtTest {
             .build()
 
         assertThrows(PixClientNotFoundException::class.java) {
-            request.buscaTitular(client)
+            buscaCliente.buscaTitular(request.idCliente)
         }
     }
 
