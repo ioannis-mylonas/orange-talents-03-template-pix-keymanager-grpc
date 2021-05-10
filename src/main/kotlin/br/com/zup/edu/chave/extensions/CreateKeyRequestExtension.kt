@@ -2,17 +2,10 @@ package br.com.zup.edu.chave.extensions
 
 import br.com.zup.edu.CreateKeyRequest
 import br.com.zup.edu.TipoChave
-import br.com.zup.edu.chave.ChavePix
 import br.com.zup.edu.chave.ChavePixRepository
-import br.com.zup.edu.chave.cliente.ChaveClient
 import br.com.zup.edu.chave.cliente.ClienteDetalhes
-import br.com.zup.edu.chave.exceptions.PixAlreadyExistsException
-import br.com.zup.edu.chave.exceptions.PixClientNotFoundException
-import br.com.zup.edu.chave.exceptions.PixClientWrongCpfException
-import br.com.zup.edu.chave.exceptions.PixPermissionDeniedException
+import br.com.zup.edu.chave.exceptions.*
 import br.com.zup.edu.chave.validation.PixValidator
-import io.micronaut.http.client.exceptions.HttpClientResponseException
-import java.util.*
 
 /**
  * Valida a chave PIX conforme uma Collection de PixValidators.

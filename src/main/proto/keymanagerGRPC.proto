@@ -17,16 +17,18 @@ service KeymanagerGRPCService {
 }
 
 enum TipoChave {
-  CPF = 0;
-  CNPJ = 1;
-  PHONE = 2;
-  EMAIL = 3;
-  RANDOM = 4;
+  TIPO_CHAVE_DESCONHECIDO = 0;
+  CPF = 1;
+  CNPJ = 2;
+  PHONE = 3;
+  EMAIL = 4;
+  RANDOM = 5;
 }
 
 enum TipoConta {
-  CONTA_CORRENTE = 0;
-  CONTA_POUPANCA = 1;
+  TIPO_CONTA_DESCONHECIDO = 0;
+  CONTA_CORRENTE = 1;
+  CONTA_POUPANCA = 2;
 }
 
 message CreateKeyRequest {

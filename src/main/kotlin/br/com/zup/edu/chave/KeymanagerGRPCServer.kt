@@ -25,6 +25,12 @@ class KeymanagerGRPCServer(
 ): KeymanagerGRPCServiceGrpc.KeymanagerGRPCServiceImplBase() {
     @ExceptionInterceptor
     override fun cria(request: CreateKeyRequest, responseObserver: StreamObserver<CreateKeyResponse>) {
+        if (request.tipoConta == TipoConta.TIPO_CONTA_DESCONHECIDO)
+            throw PixTipoContaUnknownException()
+
+        if (request.tipoChave == TipoChave.TIPO_CHAVE_DESCONHECIDO)
+            throw PixTipoChaveUnknownException()
+
         val detalhes = buscaCliente.buscaDetalhesCliente(request.idCliente, request.tipoConta)
 
         request.validaDadosClientes(detalhes)
