@@ -20,6 +20,7 @@ dbPass: "password"
 erpUrl: "http://localhost:9091"
 bcbUrl: "http://localhost:8082"
 secretType: Opaque
+dbDialect: "POSTGRES"
 
 serviceAccount:
   # Specifies whether a service account should be created
