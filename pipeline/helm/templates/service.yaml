@@ -4,6 +4,8 @@ metadata:
   name: {{ include "helm.fullname" . }}-service
   labels:
     {{- include "helm.labels" . | nindent 4 }}
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-internal: "true"
 spec:
   type: {{ .Values.service.type }}
   ports:
