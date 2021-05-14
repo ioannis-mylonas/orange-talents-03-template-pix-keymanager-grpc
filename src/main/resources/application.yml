@@ -3,12 +3,14 @@ micronaut:
     name: keymanagerGRPC
 datasources:
   default:
-    url: ${DB_URL:`jdbc:postgresql://localhost:5432/pix`}
+    url: ${DB_URI:`jdbc:postgresql://localhost:5432/pix`}
     driverClassName: org.postgresql.Driver
     username: ${DB_USER:`keycloak`}
-    password: ${DB_PASS:`password`}
-    dialect: POSTGRES
+    password: ${DB_PASSWORD:`password`}
+    dialect: ${DB_DIALECT:`POSTGRES`}
 jpa.default.properties.hibernate.hbm2ddl.auto: create
 pix:
-  erp-url: ${ERP_URL:`http://localhost:9091`}
+  erp-url: ${ITAU_URL:`http://localhost:9091`}
   bcb-url: ${BCB_URL:`http://localhost:8082`}
+endpoints:
+  health.enabled: true

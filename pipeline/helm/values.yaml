@@ -14,7 +14,7 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
-dbUrl: "jdbc:postgresql:localhost:3032/pix"
+dbUrl: "jdbc:postgresql:localhost:5432/pix"
 dbUser: "keymanager"
 dbPass: "password"
 erpUrl: "http://localhost:9091"
