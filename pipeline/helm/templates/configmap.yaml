@@ -5,8 +5,8 @@ metadata:
     labels:
         {{- include "helm.labels" . | nindent 8 }}
 data:
-    DB_URI: {{ .Values.dbUrl }}
-    DB_USER: {{ .Values.dbUser }}
-    ITAU_URL: {{ .Values.erpUrl }}
-    BCB_URL: {{ .Values.bcbUrl }}
-    DB_DIALECT: {{ .Values.dbDialect }}
+    DB_URI: {{ .Values.DB_URI }}
+    DB_USER: {{ .Values.DB_USER }}
+    ITAU_URL: {{ .Values.ITAU_URL }}
+    BCB_URL: {{ .Values.BCB_URL }}
+    DB_DIALECT: {{ .Values.DB_DIALECT }}

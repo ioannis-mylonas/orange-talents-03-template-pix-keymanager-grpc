@@ -14,13 +14,13 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
-dbUrl: "jdbc:postgresql:localhost:5432/pix"
-dbUser: "keymanager"
-dbPass: "password"
-erpUrl: "http://localhost:9091"
-bcbUrl: "http://localhost:8082"
+DB_URI: "jdbc:postgresql:localhost:5432/pix"
+DB_USER: "keymanager"
+DB_PASSWORD: "password"
+ITAU_URL: "http://localhost:9091"
+BCB_URL: "http://localhost:8082"
 secretType: Opaque
-dbDialect: "POSTGRES"
+DB_DIALECT: "POSTGRES"
 
 serviceAccount:
   # Specifies whether a service account should be created
