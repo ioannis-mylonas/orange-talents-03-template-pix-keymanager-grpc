@@ -7,6 +7,6 @@ metadata:
 data:
     DB_URI: {{ .Values.dbUrl }}
     DB_USER: {{ .Values.dbUser }}
-    ERP_URL: {{ .Values.erpUrl }}
+    ITAU_URL: {{ .Values.erpUrl }}
     BCB_URL: {{ .Values.bcbUrl }}
     DB_DIALECT: {{ .Values.dbDialect }}

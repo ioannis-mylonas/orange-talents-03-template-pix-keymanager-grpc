@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "external-services.fullname" . }}
+  labels:
+    {{- include "external-services.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: 8082
+      targetPort: bcb-port
+      protocol: TCP
+      name: bcb-port
+    - port: 9091
+      targetPort: erp-port
+      protocol: TCP
+      name: erp-port
+    - port: 5432
+      targetPort: db-port
+      protocol: TCP
+      name: db-port
+  selector:
+    {{- include "external-services.selectorLabels" . | nindent 4 }}

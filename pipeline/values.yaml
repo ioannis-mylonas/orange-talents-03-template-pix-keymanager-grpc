@@ -1,0 +1,6 @@
+dbUrl: "jdbc:postgresql://external-pix-services:5432/pix"
+erpUrl: "http://external-pix-services:9091"
+bcbUrl: "http://external-pix-services:8082"
+dbUser: "keymanager"
+dbPass: "123456"
+dbDialect: "POSTGRES"
