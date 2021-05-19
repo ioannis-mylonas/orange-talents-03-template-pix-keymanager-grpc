@@ -44,9 +44,9 @@ internal class TestaListagemChavePix {
         instituicao2, "2", "2", titular2)
     private val chaves2 = listOf(
         ChavePix(TipoChave.RANDOM, UUID.randomUUID().toString(), detalhes2.tipo, titular2.cpf, LocalDateTime.now()),
-        ChavePix(TipoChave.CPF, titular1.cpf, detalhes2.tipo, titular2.cpf, LocalDateTime.now()),
-        ChavePix(TipoChave.PHONE, "+123", detalhes2.tipo, titular2.cpf, LocalDateTime.now()),
-        ChavePix(TipoChave.EMAIL, "1@email.com", detalhes2.tipo, titular2.cpf, LocalDateTime.now())
+        ChavePix(TipoChave.CPF, titular2.cpf, detalhes2.tipo, titular2.cpf, LocalDateTime.now()),
+        ChavePix(TipoChave.PHONE, "+456", detalhes2.tipo, titular2.cpf, LocalDateTime.now()),
+        ChavePix(TipoChave.EMAIL, "2@email.com", detalhes2.tipo, titular2.cpf, LocalDateTime.now())
     )
 
     @BeforeEach
