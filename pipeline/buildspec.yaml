@@ -1,0 +1,48 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo Install phase started on `date`
+      - curl -o /bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.16.0/bin/linux/amd64/kubectl
+      - curl -sS -o /bin/aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.10.3/2018-07-26/bin/linux/amd64/aws-iam-authenticator
+      - wget -qO https://get.helm.sh/helm-v3.5.2-linux-amd64.tar.gz | tar xvz
+      - mv linux-amd64/helm /bin/helm
+      - chmod +x /bin/kubectl /bin/helm /bin/aws-iam-authenticator
+      - export PATH=$PWD/:$PATH
+      - apt-get update && apt-get -y install jq python3-pip python3-dev && pip3 install --upgrade awscli
+      - echo Install phase ended on `date`
+  
+  pre_build:
+    commands:
+      - echo Pre-build phase started on `date`
+      - echo Connecting ECR
+      - docker login -u AWS -p $(aws ecr-public get-login-password --region us-east-1) $URL_REPO
+      - echo Packaging .jar file...
+      - sh ./gradlew build
+      - echo Executing tests...
+      - sh ./gradlew clean test
+      - echo Exporting kubeconfig...
+      - export KUBECONFIG=$HOME/.kube/config
+      - echo Pre-build phase ended on `date`
+  
+  build:
+    commands:
+      - echo Build phase started on `date`
+      - echo Building Docker image...
+      - docker build -t $DEPLOYMENT_NAME
+      - docker tag $DEPLOYMENT_NAME:$IMAGE_TAG $URL_REPO/$DEPLOYMENT_NAME:$IMAGE_TAG
+      - echo Build phase ended on `date`
+  
+  post_build:
+    commands:
+      - echo Post-Build phase started on `date`
+      - echo Pushing Docker image...
+      - docker push $URL_REPO/$DEPLOYMENT_NAME:$IMAGE_TAG
+      - echo Push completed on `date`
+      - echo Deploying to cluster...
+      - helm version --short
+      - helm lint ./pipeline/helm --values ./pipeline/helm/values.yaml
+      - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --role-arn $ARN_ROLE
+      - kubectl get nodes
+      - helm upgrade -i $DEPLOYMENT_NAME ./pipeline/helm --values ./pipeline/helm/values.yaml
