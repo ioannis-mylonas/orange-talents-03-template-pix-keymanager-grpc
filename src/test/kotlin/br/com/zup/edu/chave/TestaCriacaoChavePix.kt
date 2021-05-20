@@ -22,6 +22,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EmptySource
 import org.junit.jupiter.params.provider.ValueSource
@@ -289,6 +290,41 @@ internal class TestaCriacaoChavePix {
 
         Mockito.`when`(mockBcbClient.cadastra(MockitoHelper.anyObject()))
             .thenThrow(HttpClientResponseException("", HttpResponse.badRequest<Any>()))
+
+        val erro = assertThrows(StatusRuntimeException::class.java) {
+            client.cria(request)
+        }
+
+        assertEquals(Status.INVALID_ARGUMENT.code, erro.status.code)
+    }
+
+    @Test
+    fun `testa tipo de conta unknown`() {
+        val request = requestBuilder
+            .setTipoConta(TipoConta.TIPO_CONTA_DESCONHECIDO)
+            .setTipoChave(TipoChave.RANDOM)
+            .setChave("")
+            .build()
+
+        Mockito.`when`(mockResponse.key).thenReturn(UUID.randomUUID().toString())
+        Mockito.`when`(mockResponse.keyType).thenReturn(TipoChave.RANDOM)
+
+        val erro = assertThrows(StatusRuntimeException::class.java) {
+            client.cria(request)
+        }
+
+        assertEquals(Status.INVALID_ARGUMENT.code, erro.status.code)
+    }
+
+    @Test
+    fun `testa tipo de chave unknown`() {
+        val request = requestBuilder
+            .setTipoChave(TipoChave.TIPO_CHAVE_DESCONHECIDO)
+            .setChave("")
+            .build()
+
+        Mockito.`when`(mockResponse.key).thenReturn(UUID.randomUUID().toString())
+        Mockito.`when`(mockResponse.keyType).thenReturn(TipoChave.RANDOM)
 
         val erro = assertThrows(StatusRuntimeException::class.java) {
             client.cria(request)

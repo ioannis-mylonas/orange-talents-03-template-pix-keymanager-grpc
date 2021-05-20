@@ -2,6 +2,7 @@ package br.com.zup.edu.chave.extensions
 
 import br.com.zup.edu.CreateKeyRequest
 import br.com.zup.edu.TipoChave
+import br.com.zup.edu.TipoConta
 import br.com.zup.edu.chave.ChavePixRepository
 import br.com.zup.edu.chave.cliente.ClienteDetalhes
 import br.com.zup.edu.chave.exceptions.*
@@ -32,6 +33,9 @@ fun CreateKeyRequest.validaUniqueness(repository: ChavePixRepository) {
  * @throws PixPermissionDeniedException Se o CPF não bater com o cadastro no ERP.
  */
 fun CreateKeyRequest.validaDadosClientes(detalhes: ClienteDetalhes) {
+    if (tipoConta == TipoConta.TIPO_CONTA_DESCONHECIDO || tipoConta == TipoConta.UNRECOGNIZED)
+        throw PixTipoContaUnknownException()
+
     if (tipoChave == TipoChave.CPF && chave != detalhes.titular.cpf) {
         throw PixClientWrongCpfException()
     }
