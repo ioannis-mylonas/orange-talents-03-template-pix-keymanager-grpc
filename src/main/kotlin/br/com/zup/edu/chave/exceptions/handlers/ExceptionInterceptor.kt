@@ -1,6 +1,7 @@
 package br.com.zup.edu.chave.exceptions.handlers
 
 import br.com.zup.edu.chave.exceptions.PixException
+import io.grpc.protobuf.StatusProto
 import io.grpc.stub.StreamObserver
 import io.micronaut.aop.Around
 import io.micronaut.aop.InterceptorBean
@@ -25,7 +26,7 @@ private class ExceptionInterceptorResolver(@Inject private val resolver: Excepti
     private fun handle(e: PixException, observer: StreamObserver<*>?) {
         val handler = resolver.resolve(e) ?: return
         val status = handler.handle(e)
-        observer?.onError(status.asRuntimeException())
+        observer?.onError(StatusProto.toStatusRuntimeException(status))
     }
 
     override fun intercept(context: MethodInvocationContext<Any, Any>): Any? {

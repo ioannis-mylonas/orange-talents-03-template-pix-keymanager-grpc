@@ -8,19 +8,18 @@ import br.com.zup.edu.chave.cliente.ChaveClient
 import br.com.zup.edu.chave.cliente.ClienteDetalhes
 import br.com.zup.edu.chave.cliente.ClienteDetalhesInstituicao
 import br.com.zup.edu.chave.cliente.ClienteDetalhesTitular
-import io.grpc.ManagedChannel
+import br.com.zup.edu.chave.extensions.asBadRequest
+import br.com.zup.edu.chave.extensions.hasFieldViolations
+import com.google.rpc.BadRequest
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
-import io.micronaut.context.annotation.Factory
-import io.micronaut.grpc.annotation.GrpcChannel
-import io.micronaut.grpc.server.GrpcServerChannel
+import io.grpc.protobuf.StatusProto
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.test.annotation.MockBean
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -30,7 +29,6 @@ import org.mockito.Mockito
 import java.time.LocalDateTime
 import java.util.*
 import javax.inject.Inject
-import javax.inject.Singleton
 
 @MicronautTest(transactional = false, rollback = false)
 internal class TestaCriacaoChavePix {
@@ -55,6 +53,30 @@ internal class TestaCriacaoChavePix {
     private val detalhes = ClienteDetalhes(DEFAULT_TIPO_CONTA, instituicao, "AGENCIA", DEFAULT_NUMERO, titular)
 
     private val mockResponse = Mockito.mock(BcbCreatePixKeyResponse::class.java, Mockito.RETURNS_DEEP_STUBS)
+
+    /**
+     * Retorna a StatusRuntimeException jogada pelo servidor (conforme esperado no teste)
+     * @param request Request a ser enviada para o servidor
+     * @param code Status.Code esperado da StatusRuntimeException
+     */
+    private fun getException(request: CreateKeyRequest, code: Status.Code): StatusRuntimeException {
+        val error = assertThrows(StatusRuntimeException::class.java) {
+            client.cria(request)
+        }
+
+        assertEquals(code, error.status.code)
+        return error
+    }
+
+    /**
+     * Recebe um BadRequest de um StatusRuntimeException
+     * @param e StatusRuntimeException jogado pelo servidor
+     * @return BadRequest com os field violations e seus detalhes
+     */
+    private fun getBadRequest(e: StatusRuntimeException): BadRequest {
+        val status = StatusProto.fromThrowable(e) ?: fail()
+        return status.detailsList[0].asBadRequest()
+    }
 
     @BeforeEach
     fun setup() {
@@ -90,11 +112,13 @@ internal class TestaCriacaoChavePix {
             .setChave(cpf)
             .build()
 
-        val erro = assertThrows(StatusRuntimeException::class.java) {
-            client.cria(request)
-        }
+        val e = getException(request, Status.INVALID_ARGUMENT.code)
+        val badRequest = getBadRequest(e)
 
-        assertEquals(Status.INVALID_ARGUMENT.code, erro.status.code)
+        val expected = mutableSetOf("chave" to "Formato de CPF inválido")
+        if (cpf.isBlank()) expected.add("chave" to "must not be blank")
+
+        assertTrue(badRequest.hasFieldViolations(expected))
     }
 
     @ParameterizedTest
@@ -136,11 +160,7 @@ internal class TestaCriacaoChavePix {
 
         client.cria(request)
 
-        val error = assertThrows(StatusRuntimeException::class.java) {
-            client.cria(request)
-        }
-
-        assertEquals(Status.ALREADY_EXISTS.code, error.status.code)
+        getException(request, Status.ALREADY_EXISTS.code)
     }
 
     @ParameterizedTest
@@ -162,11 +182,7 @@ internal class TestaCriacaoChavePix {
         Mockito.`when`(mockBcbClient.cadastra(MockitoHelper.anyObject()))
             .thenThrow(HttpClientResponseException("", HttpResponse.unprocessableEntity<Any>()))
 
-        val error = assertThrows(StatusRuntimeException::class.java) {
-            client.cria(request)
-        }
-
-        assertEquals(Status.ALREADY_EXISTS.code, error.status.code)
+        getException(request, Status.ALREADY_EXISTS.code)
     }
 
     @ParameterizedTest
@@ -180,11 +196,14 @@ internal class TestaCriacaoChavePix {
 
         Mockito.`when`(mockResponse.key).thenReturn(email)
         Mockito.`when`(mockResponse.keyType).thenReturn(TipoChave.EMAIL)
-        val erro = assertThrows(StatusRuntimeException::class.java) {
-            client.cria(request)
-        }
 
-        assertEquals(Status.INVALID_ARGUMENT.code, erro.status.code)
+        val e = getException(request, Status.INVALID_ARGUMENT.code)
+        val badRequest = getBadRequest(e)
+
+        val expected = mutableSetOf("chave" to "must be a well-formed email address")
+        if (email.isBlank()) expected.add("chave" to "must not be blank")
+
+        assertTrue(badRequest.hasFieldViolations(expected))
     }
 
     @ParameterizedTest
@@ -211,11 +230,14 @@ internal class TestaCriacaoChavePix {
 
         Mockito.`when`(mockResponse.key).thenReturn(celular)
         Mockito.`when`(mockResponse.keyType).thenReturn(TipoChave.PHONE)
-        val erro = assertThrows(StatusRuntimeException::class.java) {
-            client.cria(request)
-        }
 
-        assertEquals(Status.INVALID_ARGUMENT.code, erro.status.code)
+        val e = getException(request, Status.INVALID_ARGUMENT.code)
+        val badRequest = getBadRequest(e)
+
+        val expected = mutableSetOf("chave" to "Formato de celular inválido.")
+        if (celular.isBlank()) expected.add("chave" to "must not be blank")
+
+        assertTrue(badRequest.hasFieldViolations(expected))
     }
 
     @ParameterizedTest
@@ -243,11 +265,7 @@ internal class TestaCriacaoChavePix {
         Mockito.`when`(mockResponse.keyType).thenReturn(TipoChave.PHONE)
         client.cria(request)
 
-        val erro = assertThrows(StatusRuntimeException::class.java) {
-            client.cria(request)
-        }
-
-        assertEquals(Status.ALREADY_EXISTS.code, erro.status.code)
+        getException(request, Status.ALREADY_EXISTS.code)
     }
 
     @ParameterizedTest
@@ -260,11 +278,12 @@ internal class TestaCriacaoChavePix {
 
         Mockito.`when`(mockResponse.key).thenReturn(aleatorio)
         Mockito.`when`(mockResponse.keyType).thenReturn(TipoChave.RANDOM)
-        val erro = assertThrows(StatusRuntimeException::class.java) {
-            client.cria(request)
-        }
 
-        assertEquals(Status.INVALID_ARGUMENT.code, erro.status.code)
+        val exception = getException(request, Status.INVALID_ARGUMENT.code)
+        val badRequest = getBadRequest(exception)
+        val expected = setOf("chave" to "Valor deve estar vazio.")
+
+        assertTrue(badRequest.hasFieldViolations(expected))
     }
 
     @ParameterizedTest
