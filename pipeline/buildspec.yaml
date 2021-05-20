@@ -46,3 +46,11 @@ phases:
       - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --role-arn $ARN_ROLE
       - kubectl get nodes
       - helm upgrade -i $DEPLOYMENT_NAME ./pipeline/helm --values ./pipeline/helm/values.yaml
+
+cache:
+  paths:
+    - '/bin/kubectl/**/*'
+    - '/bin/aws-iam-authenticator/**/*'
+    - '/bin/helm/**/*'
+    - '/root/.cache/pip/**/*'
+    - '/root/.gradle/caches/**/*'
