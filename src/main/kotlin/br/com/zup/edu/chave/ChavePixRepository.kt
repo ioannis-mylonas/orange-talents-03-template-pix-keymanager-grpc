@@ -14,6 +14,7 @@ import io.micronaut.http.HttpStatus
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import java.net.http.HttpClient
 import java.util.*
+import javax.transaction.Transactional
 
 @Repository
 interface ChavePixRepository: JpaRepository<ChavePix, Long> {
@@ -30,6 +31,7 @@ interface ChavePixRepository: JpaRepository<ChavePix, Long> {
  * @param bcbClient O client para comunicação com o BCB.
  * @return Chave salva, com ID gerado pelo sistema.
  */
+@Transactional
 fun ChavePixRepository.saveBcb(input: CreateKeyRequest, detalhes: ClienteDetalhes, bcbClient: BcbClient): ChavePix {
     try {
         val request = BcbCreatePixKeyRequest.fromDetalhesCliente(detalhes, input)
@@ -56,6 +58,7 @@ fun ChavePixRepository.saveBcb(input: CreateKeyRequest, detalhes: ClienteDetalhe
  * @param chave Chave a ser excluída.
  * @param bcbClient Client para comunicação com BCB.
  */
+@Transactional
 fun ChavePixRepository.deleteBcb(chave: ChavePix, bcbClient: BcbClient) {
     try {
         val request = BcbDeletePixKeyRequest(chave.chave)
