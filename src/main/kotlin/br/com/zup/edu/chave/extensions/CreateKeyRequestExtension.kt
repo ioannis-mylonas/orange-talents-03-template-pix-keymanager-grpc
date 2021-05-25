@@ -9,12 +9,19 @@ import br.com.zup.edu.chave.exceptions.*
 import br.com.zup.edu.chave.validation.PixValidator
 
 /**
- * Valida a chave PIX conforme uma Collection de PixValidators.
+ * Valida a chave PIX conforme uma Collection de PixValidators e seus
+ * métodos validadores internos.
  */
-fun CreateKeyRequest.valida(validators: Collection<PixValidator>) {
+fun CreateKeyRequest.valida(validators: Collection<PixValidator>,
+                            repository: ChavePixRepository,
+                            detalhes: ClienteDetalhes) {
+
     validators.forEach {
         it.validate(chave, tipoChave)
     }
+
+    validaUniqueness(repository)
+    validaDadosClientes(detalhes)
 }
 
 /**

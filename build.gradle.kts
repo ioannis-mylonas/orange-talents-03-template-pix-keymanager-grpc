@@ -28,6 +28,7 @@ micronaut {
 
 dependencies {
     kapt("io.micronaut.data:micronaut-data-processor")
+    implementation("io.reactivex.rxjava3:rxkotlin:3.0.1")
     implementation("io.micronaut:micronaut-runtime")
     implementation("io.micronaut:micronaut-management")
     implementation("io.micronaut:micronaut-http-client")

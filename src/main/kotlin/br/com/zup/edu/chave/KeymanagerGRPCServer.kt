@@ -27,10 +27,7 @@ class KeymanagerGRPCServer(
     override fun cria(request: CreateKeyRequest, responseObserver: StreamObserver<CreateKeyResponse>) {
         val detalhes = buscaCliente.buscaDetalhesCliente(request.idCliente, request.tipoConta)
 
-        request.validaDadosClientes(detalhes)
-        request.valida(validators)
-        request.validaUniqueness(repository)
-
+        request.valida(validators, repository, detalhes)
         val chave = repository.saveBcb(request, detalhes, bcbClient)
 
         val response = CreateKeyResponse.newBuilder()
@@ -44,10 +41,9 @@ class KeymanagerGRPCServer(
     @ExceptionInterceptor
     override fun delete(request: DeleteKeyRequest, responseObserver: StreamObserver<DeleteKeyResponse>) {
         val dados = buscaCliente.buscaTitular(request.idCliente)
-
         val chave = repository.findById(request.idPix).orElseThrow { PixChaveNotFound() }
-        if (!request.isDono(chave, dados)) throw PixClientKeyPermissionException()
 
+        request.validaDono(chave, dados)
         repository.deleteBcb(chave, bcbClient)
 
         // Se eventualmente o retorno mudar, temos um builder aqui
@@ -62,7 +58,7 @@ class KeymanagerGRPCServer(
         val chave = repository.findBcb(request.idPix, bcbClient)
         val detalhes = buscaCliente.buscaDetalhesCliente(request.idCliente, chave.tipoConta)
 
-        if (!request.isDono(chave, detalhes.titular)) throw PixClientKeyPermissionException()
+        request.validaDono(chave, detalhes.titular)
 
         val responseTitular = GetKeyResponse.Titular.newBuilder()
             .setCpf(detalhes.titular.cpf)
