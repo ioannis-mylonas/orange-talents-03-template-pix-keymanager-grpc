@@ -5,6 +5,8 @@ import br.com.zup.edu.DeleteKeyRequest
 import br.com.zup.edu.TipoConta
 import br.com.zup.edu.chave.exceptions.PixClientNotFoundException
 import io.micronaut.http.client.exceptions.HttpClientResponseException
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.schedulers.Schedulers
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -27,16 +29,29 @@ class BuscaClienteDetalhes(@Inject val client: ChaveClient) {
 
     /**
      * Busca cliente no ERP, por número.
-     * @param client Um client para consulta no ERP.
+     * @param idCliente ID interno do cliente.
      * @return Titular, conforme consultado.
      * @throws PixClientNotFoundException Se o cliente não for encontrado.
      */
     fun buscaTitular(idCliente: String): ClienteDetalhesTitular {
         val cliente = try {
             client.buscaCliente(idCliente)
-        } catch (e: HttpClientResponseException) { null }
+        } catch (e: HttpClientResponseException) {
+            null
+        }
 
         cliente ?: throw PixClientNotFoundException(idCliente)
         return cliente
+    }
+
+    /**
+     * Busca cliente no ERP de forma assíncrona
+     * @param idCliente ID interno do cliente
+     * @return Single para consulta assíncrona do cliente
+     */
+    fun asyncBuscaTitular(idCliente: String): Single<ClienteDetalhesTitular> {
+        return Single.fromCallable { buscaTitular(idCliente) }
+            .subscribeOn(Schedulers.newThread())
+            .onErrorResumeNext { Single.error(it) }
     }
 }

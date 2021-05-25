@@ -56,14 +56,10 @@ class KeymanagerGRPCServer(
     // TODO: Reorganizar
     @ExceptionInterceptor
     override fun delete(request: DeleteKeyRequest, responseObserver: StreamObserver<DeleteKeyResponse>) {
-        val singleDetalhes = Single.create<ClienteDetalhesTitular> {
-            val dados = buscaCliente.buscaTitular(request.idCliente)
-            it.onSuccess(dados)
-        }.subscribeOn(Schedulers.newThread()).onErrorResumeNext { Single.error(it) }
+        val singleDetalhes = buscaCliente.asyncBuscaTitular(request.idCliente)
 
-        val singleChave = Single.create<ChavePix> {
-            val chave = repository.findById(request.idPix).orElseThrow { PixChaveNotFound() }
-            it.onSuccess(chave)
+        val singleChave = Single.fromCallable {
+            repository.findById(request.idPix).orElseThrow { PixChaveNotFound() }
         }.subscribeOn(Schedulers.newThread()).onErrorResumeNext { Single.error(it) }
 
         Single.zip(singleChave, singleDetalhes) { chave, dados ->
