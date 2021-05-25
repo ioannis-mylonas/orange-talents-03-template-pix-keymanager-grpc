@@ -26,7 +26,7 @@ private class ExceptionInterceptorResolver(@Inject private val resolver: Excepti
     private fun handle(e: PixException, observer: StreamObserver<*>?) {
         val handler = resolver.resolve(e) ?: return
         val status = handler.handle(e)
-        observer?.onError(StatusProto.toStatusRuntimeException(status))
+        observer?.onError(status)
     }
 
     override fun intercept(context: MethodInvocationContext<Any, Any>): Any? {

@@ -1,8 +1,9 @@
 package br.com.zup.edu.chave.exceptions.handlers
 
 import br.com.zup.edu.chave.exceptions.PixException
-import com.google.rpc.Code
 import com.google.rpc.Status
+import io.grpc.StatusRuntimeException
+import io.grpc.protobuf.StatusProto
 
 /**
  * Handler que recebe e processa um tipo de PixException. Não deve existir
@@ -14,12 +15,12 @@ abstract class PixExceptionHandler<E: PixException> {
      * @param e A PixException a ser processada.
      * @return Status apropriado, conforme processamento da PixException recebida.
      */
-    abstract fun handle(e: E): Status
+    abstract fun handle(e: E): StatusRuntimeException
 
-    protected fun handle(e: E, code: Int): Status {
+    protected fun handle(e: E, code: Int): StatusRuntimeException {
         val builder = Status.newBuilder().setCode(code)
         if (e.message != null) builder.setMessage(e.message)
-        return builder.build()
+        return StatusProto.toStatusRuntimeException(builder.build())
     }
 
     /**

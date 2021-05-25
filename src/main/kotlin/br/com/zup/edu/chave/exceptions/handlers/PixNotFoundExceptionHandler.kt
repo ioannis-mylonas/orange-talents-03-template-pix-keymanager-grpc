@@ -3,7 +3,7 @@ package br.com.zup.edu.chave.exceptions.handlers
 import br.com.zup.edu.chave.exceptions.PixException
 import br.com.zup.edu.chave.exceptions.PixNotFoundException
 import com.google.rpc.Code
-import com.google.rpc.Status
+import io.grpc.StatusRuntimeException
 import javax.inject.Singleton
 
 @Singleton
@@ -12,7 +12,7 @@ class PixNotFoundExceptionHandler: PixExceptionHandler<PixNotFoundException>() {
         return e is PixNotFoundException
     }
 
-    override fun handle(e: PixNotFoundException): Status {
+    override fun handle(e: PixNotFoundException): StatusRuntimeException {
         return handle(e, Code.NOT_FOUND_VALUE)
     }
 }
