@@ -10,6 +10,7 @@ import br.com.zup.edu.chave.exceptions.handlers.ExceptionHandlerResolver
 import br.com.zup.edu.chave.exceptions.handlers.ExceptionInterceptor
 import br.com.zup.edu.chave.extensions.*
 import br.com.zup.edu.chave.validation.PixValidator
+import io.grpc.Status
 import io.grpc.protobuf.StatusProto
 import io.grpc.stub.StreamObserver
 import io.reactivex.rxjava3.core.Single
@@ -32,7 +33,11 @@ class KeymanagerGRPCServer(
     }
 
     private fun<T> error(e: Throwable, observer: StreamObserver<T>) {
-        if (e !is PixException) throw e
+        if (e !is PixException) {
+            observer.onError(Status.UNKNOWN.asRuntimeException())
+            throw e
+        }
+
         val handler = handlerResolver.resolve(e)
         val status = handler?.handle(e)
         observer.onError(status)
@@ -53,7 +58,6 @@ class KeymanagerGRPCServer(
             .subscribe({ success(it, responseObserver) }, { error(it, responseObserver) })
     }
 
-    // TODO: Reorganizar
     @ExceptionInterceptor
     override fun delete(request: DeleteKeyRequest, responseObserver: StreamObserver<DeleteKeyResponse>) {
         val singleDetalhes = buscaCliente.asyncBuscaTitular(request.idCliente)
@@ -79,29 +83,33 @@ class KeymanagerGRPCServer(
 
         request.validaDono(chave, detalhes.titular)
 
-        val responseTitular = GetKeyResponse.Titular.newBuilder()
-            .setCpf(detalhes.titular.cpf)
-            .setNome(detalhes.titular.nome)
-            .build()
+        val titularSingle = Single.fromCallable {
+            GetKeyResponse.Titular.newBuilder()
+                .setCpf(detalhes.titular.cpf)
+                .setNome(detalhes.titular.nome)
+                .build()
+        }.subscribeOn(Schedulers.newThread()).onErrorResumeNext { Single.error(it) }
 
-        val responseInstituicao = GetKeyResponse.Instituicao.newBuilder()
-            .setAgencia(detalhes.agencia)
-            .setConta(detalhes.numero)
-            .setNome(detalhes.instituicao.nome)
-            .setTipoConta(detalhes.tipo)
-            .build()
+        val instituicaoSingle = Single.fromCallable {
+            GetKeyResponse.Instituicao.newBuilder()
+                .setAgencia(detalhes.agencia)
+                .setConta(detalhes.numero)
+                .setNome(detalhes.instituicao.nome)
+                .setTipoConta(detalhes.tipo)
+                .build()
+        }.subscribeOn(Schedulers.newThread()).onErrorResumeNext { Single.error(it) }
 
-        val response = GetKeyResponse.newBuilder()
-            .setIdPix(chave.id)
-            .setChave(chave.chave)
-            .setTipoChave(chave.tipoChave)
-            .setIdCliente(request.idCliente)
-            .setTitular(responseTitular)
-            .setInstituicao(responseInstituicao)
-            .setCriadaEm(chave.dataCriacao.toString())
-            .build()
-
-        success(response, responseObserver)
+        Single.zip(titularSingle, instituicaoSingle) { titular, instituicao ->
+            GetKeyResponse.newBuilder()
+                .setIdPix(chave.id)
+                .setChave(chave.chave)
+                .setTipoChave(chave.tipoChave)
+                .setIdCliente(request.idCliente)
+                .setTitular(titular)
+                .setInstituicao(instituicao)
+                .setCriadaEm(chave.dataCriacao.toString())
+                .build()
+        }.subscribe({ success(it, responseObserver) }, { error(it, responseObserver) })
     }
 
     @ExceptionInterceptor
@@ -110,39 +118,49 @@ class KeymanagerGRPCServer(
         val chaves = repository.findByCpf(titular.cpf)
 
         val result = mutableSetOf<GetKeyResponse>()
-        chaves.forEach {
-            if (repository.validaBcb(it, bcbClient)) {
-                val detalhes = buscaCliente.buscaDetalhesCliente(request.idCliente, it.tipoConta)
+        val operations = mutableListOf<Single<Unit>>()
 
-                val resTitular = GetKeyResponse.Titular.newBuilder()
-                    .setNome(titular.nome)
-                    .setCpf(titular.cpf)
-                    .build()
+        chaves.forEach { chave ->
+            operations.add(Single.create<Unit> {
+                if (repository.validaBcb(chave, bcbClient)) {
+                    val detalhes = buscaCliente.buscaDetalhesCliente(request.idCliente, chave.tipoConta)
 
-                val resInstituicao = GetKeyResponse.Instituicao.newBuilder()
-                    .setNome(detalhes.instituicao.nome)
-                    .setAgencia(detalhes.agencia)
-                    .setConta(detalhes.numero)
-                    .setTipoConta(detalhes.tipo)
-                    .build()
-
-                result.add(
-                    GetKeyResponse.newBuilder()
-                        .setIdPix(it.id)
-                        .setIdCliente(request.idCliente)
-                        .setTipoChave(it.tipoChave)
-                        .setChave(it.chave)
-                        .setTitular(resTitular)
-                        .setInstituicao(resInstituicao)
-                        .setCriadaEm(it.dataCriacao.toString())
+                    val resTitular = GetKeyResponse.Titular.newBuilder()
+                        .setNome(titular.nome)
+                        .setCpf(titular.cpf)
                         .build()
-                )
-            }
+
+                    val resInstituicao = GetKeyResponse.Instituicao.newBuilder()
+                        .setNome(detalhes.instituicao.nome)
+                        .setAgencia(detalhes.agencia)
+                        .setConta(detalhes.numero)
+                        .setTipoConta(detalhes.tipo)
+                        .build()
+
+                    result.add(
+                        GetKeyResponse.newBuilder()
+                            .setIdPix(chave.id)
+                            .setIdCliente(request.idCliente)
+                            .setTipoChave(chave.tipoChave)
+                            .setChave(chave.chave)
+                            .setTitular(resTitular)
+                            .setInstituicao(resInstituicao)
+                            .setCriadaEm(chave.dataCriacao.toString())
+                            .build()
+                    )
+                }
+
+                it.onSuccess(Unit)
+            }.subscribeOn(Schedulers.newThread()).onErrorResumeNext { Single.error(it) })
         }
 
-        val response = ListKeyResponse.newBuilder().addAllChaves(result).build()
-
-        responseObserver.onNext(response)
-        responseObserver.onCompleted()
+        if (operations.isEmpty()) {
+            val response = ListKeyResponse.getDefaultInstance()
+            success(response, responseObserver)
+        } else {
+            Single.zip(operations) {
+                ListKeyResponse.newBuilder().addAllChaves(result).build()
+            }.subscribe({ success(it, responseObserver) }, { error(it, responseObserver) })
+        }
     }
 }
