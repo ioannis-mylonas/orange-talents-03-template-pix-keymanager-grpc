@@ -6,7 +6,7 @@ phases:
       - echo Install phase started on `date`
       - curl -o /bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.16.0/bin/linux/amd64/kubectl
       - curl -sS -o /bin/aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.10.3/2018-07-26/bin/linux/amd64/aws-iam-authenticator
-      - wget -qO https://get.helm.sh/helm-v3.5.2-linux-amd64.tar.gz | tar xvz
+      - wget -qO- https://get.helm.sh/helm-v3.5.2-linux-amd64.tar.gz | tar xvz
       - mv linux-amd64/helm /bin/helm
       - mv ./aws-iam-authenticator /bin/aws-iam-authenticator
       - chmod +x /bin/kubectl /bin/helm /bin/aws-iam-authenticator
