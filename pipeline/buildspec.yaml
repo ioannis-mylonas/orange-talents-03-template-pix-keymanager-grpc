@@ -30,7 +30,7 @@ phases:
     commands:
       - echo Build phase started on `date`
       - echo Building Docker image...
-      - docker build -t $DEPLOYMENT_NAME
+      - docker build -t $DEPLOYMENT_NAME .
       - docker tag $DEPLOYMENT_NAME:$IMAGE_TAG $URL_REPO/$DEPLOYMENT_NAME:$IMAGE_TAG
       - echo Build phase ended on `date`
   
