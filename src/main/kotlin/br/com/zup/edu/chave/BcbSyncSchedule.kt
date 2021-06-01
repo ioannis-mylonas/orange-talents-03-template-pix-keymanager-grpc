@@ -14,7 +14,7 @@ class BcbSyncSchedule(
 ) {
     val logger = Logger.getLogger(BcbSyncSchedule::class.java)
 
-    @Scheduled(fixedDelay = "10s")
+//    @Scheduled(fixedDelay = "10s")
     fun sync() {
         logger.info("Syncing database to BCB...")
         val list = bcbClient.lista()
