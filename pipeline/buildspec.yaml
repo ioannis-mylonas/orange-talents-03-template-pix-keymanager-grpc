@@ -16,8 +16,6 @@ phases:
   pre_build:
     commands:
       - echo Pre-build phase started on `date`
-      - echo Connecting ECR
-      - docker login -u AWS -p $(aws ecr-public get-login-password --region us-east-1) $URL_REPO
       - echo Executing tests...
       - sh ./gradlew clean test
       - echo Packaging .jar file...
@@ -29,6 +27,8 @@ phases:
   build:
     commands:
       - echo Build phase started on `date`
+      - echo Authenticating on docker...
+      - docker login -u $DOCKER_USER -p $DOCKER_TOKEN
       - echo Building Docker image...
       - docker build -t $DEPLOYMENT_NAME .
       - docker tag $DEPLOYMENT_NAME:$IMAGE_TAG $URL_REPO/$DEPLOYMENT_NAME:$IMAGE_TAG
@@ -38,6 +38,9 @@ phases:
     commands:
       - echo Post-Build phase started on `date`
       - echo Pushing Docker image...
+      - docker logout
+      - echo Connecting ECR
+      - docker login -u AWS -p $(aws ecr-public get-login-password --region us-east-1) $URL_REPO
       - docker push $URL_REPO/$DEPLOYMENT_NAME:$IMAGE_TAG
       - echo Push completed on `date`
       - echo Deploying to cluster...
