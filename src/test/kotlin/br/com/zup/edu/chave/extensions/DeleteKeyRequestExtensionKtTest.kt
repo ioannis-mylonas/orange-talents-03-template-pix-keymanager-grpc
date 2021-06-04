@@ -62,10 +62,10 @@ internal class DeleteKeyRequestExtensionKtTest {
         val key = UUID.randomUUID().toString()
 
         val titular = ClienteDetalhesTitular("ID", "NOME", cpf)
-        val chave = ChavePix(TipoChave.RANDOM, key, TipoConta.CONTA_CORRENTE, cpf, LocalDateTime.now())
+        val chave = ChavePix(TipoChave.RANDOM, key, TipoConta.CONTA_CORRENTE, titular.id, LocalDateTime.now())
         val request = DeleteKeyRequest
             .newBuilder()
-            .setIdCliente(cpf)
+            .setIdCliente(titular.id)
             .setIdPix(chave.id)
             .build()
 

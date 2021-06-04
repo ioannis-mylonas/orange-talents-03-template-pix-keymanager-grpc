@@ -41,7 +41,7 @@ internal class TestaExclusaoChavePix {
 
         var chave = ChavePix(TipoChave.RANDOM,
             UUID.randomUUID().toString(),
-            TipoConta.CONTA_CORRENTE, titular.cpf, LocalDateTime.now())
+            TipoConta.CONTA_CORRENTE, titular.id, LocalDateTime.now())
 
         chave = repository.save(chave)
         assertTrue(repository.count() == 1L)
@@ -62,7 +62,7 @@ internal class TestaExclusaoChavePix {
 
         var chave = ChavePix(TipoChave.RANDOM,
             UUID.randomUUID().toString(),
-            TipoConta.CONTA_CORRENTE, titular.cpf, LocalDateTime.now())
+            TipoConta.CONTA_CORRENTE, titular.id, LocalDateTime.now())
 
         chave = repository.save(chave)
         assertTrue(repository.count() == 1L)

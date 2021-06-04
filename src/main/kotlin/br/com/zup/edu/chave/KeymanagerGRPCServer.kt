@@ -25,7 +25,8 @@ class KeymanagerGRPCServer(
     @Inject val repository: ChavePixRepository,
     @Inject val buscaCliente: BuscaClienteDetalhes,
     @Inject val bcbClient: BcbClient,
-    @Inject val handlerResolver: ExceptionHandlerResolver
+    @Inject val handlerResolver: ExceptionHandlerResolver,
+    @Inject val buscaChavePix: BuscaChavePix
 ): KeymanagerGRPCServiceGrpc.KeymanagerGRPCServiceImplBase() {
     private fun<T> success(response: T, observer: StreamObserver<T>) {
         observer.onNext(response)
@@ -78,44 +79,14 @@ class KeymanagerGRPCServer(
 
     @ExceptionInterceptor
     override fun get(request: GetKeyRequest, responseObserver: StreamObserver<GetKeyResponse>) {
-        val chave = repository.findBcb(request.idPix, bcbClient)
-        val detalhes = buscaCliente.buscaDetalhesCliente(request.idCliente, chave.tipoConta)
-
-        request.validaDono(chave, detalhes.titular)
-
-        val titularSingle = Single.fromCallable {
-            GetKeyResponse.Titular.newBuilder()
-                .setCpf(detalhes.titular.cpf)
-                .setNome(detalhes.titular.nome)
-                .build()
-        }.subscribeOn(Schedulers.newThread()).onErrorResumeNext { Single.error(it) }
-
-        val instituicaoSingle = Single.fromCallable {
-            GetKeyResponse.Instituicao.newBuilder()
-                .setAgencia(detalhes.agencia)
-                .setConta(detalhes.numero)
-                .setNome(detalhes.instituicao.nome)
-                .setTipoConta(detalhes.tipo)
-                .build()
-        }.subscribeOn(Schedulers.newThread()).onErrorResumeNext { Single.error(it) }
-
-        Single.zip(titularSingle, instituicaoSingle) { titular, instituicao ->
-            GetKeyResponse.newBuilder()
-                .setIdPix(chave.id)
-                .setChave(chave.chave)
-                .setTipoChave(chave.tipoChave)
-                .setIdCliente(request.idCliente)
-                .setTitular(titular)
-                .setInstituicao(instituicao)
-                .setCriadaEm(chave.dataCriacao.toString())
-                .build()
-        }.subscribe({ success(it, responseObserver) }, { error(it, responseObserver) })
+        if(request.chavePix.isNullOrBlank()) buscaChavePix.buscaInterna(request, responseObserver)
+        else buscaChavePix.buscaExterna(request, responseObserver)
     }
 
     @ExceptionInterceptor
     override fun list(request: ListKeyRequest, responseObserver: StreamObserver<ListKeyResponse>) {
         val titular = buscaCliente.buscaTitular(request.idCliente)
-        val chaves = repository.findByCpf(titular.cpf)
+        val chaves = repository.findByIdCliente(titular.id)
 
         val result = mutableSetOf<GetKeyResponse>()
         val operations = mutableListOf<Single<Unit>>()

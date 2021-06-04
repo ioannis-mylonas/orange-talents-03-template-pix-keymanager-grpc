@@ -57,7 +57,7 @@ internal class TestaConsultaUmaChavePix {
 
     @Test
     fun `testa encontra chave especificada valida`() {
-        var chave = ChavePix(bcbChave.keyType, bcbChave.key, detalhes.tipo, titular.cpf, bcbChave.createdAt)
+        var chave = ChavePix(bcbChave.keyType, bcbChave.key, detalhes.tipo, titular.id, bcbChave.createdAt)
         chave = repository.save(chave)
         assertEquals(1L, repository.count())
 
@@ -68,7 +68,23 @@ internal class TestaConsultaUmaChavePix {
 
         assertEquals(chave.chave, response.chave)
         assertEquals(chave.id, response.idPix)
-        assertEquals(chave.cpf, response.titular.cpf)
+        assertEquals(chave.idCliente, titular.id)
+    }
+
+    @Test
+    fun `testa encontra chave especificada valida busca externa`() {
+        var chave = ChavePix(bcbChave.keyType, bcbChave.key, detalhes.tipo, titular.id, bcbChave.createdAt)
+        chave = repository.save(chave)
+        assertEquals(1L, repository.count())
+
+        val request = GetKeyRequest.newBuilder()
+            .setChavePix(bcbChave.key).build()
+
+        val response = rpc.get(request)
+
+        assertEquals(chave.chave, response.chave)
+        assertEquals(chave.id, response.idPix)
+        assertEquals(chave.idCliente, titular.id)
     }
 
     @Test
@@ -95,6 +111,21 @@ internal class TestaConsultaUmaChavePix {
 
         val request = GetKeyRequest.newBuilder()
             .setIdCliente(titular.id).setIdPix(Random.nextLong()).build()
+
+        val erro = assertThrows(StatusRuntimeException::class.java) {
+            rpc.get(request)
+        }
+        assertEquals(Status.NOT_FOUND.code, erro.status.code)
+    }
+
+    @Test
+    fun `testa nao encontra chave especificada externa`() {
+        assertEquals(0L, repository.count())
+
+        Mockito.`when`(bcbClient.get(MockitoHelper.anyObject())).thenReturn(null)
+
+        val request = GetKeyRequest.newBuilder()
+            .setChavePix(UUID.randomUUID().toString()).build()
 
         val erro = assertThrows(StatusRuntimeException::class.java) {
             rpc.get(request)

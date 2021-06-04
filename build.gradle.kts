@@ -49,7 +49,9 @@ dependencies {
     runtimeOnly("ch.qos.logback:logback-classic")
     runtimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
     testImplementation("io.micronaut:micronaut-http-client")
+    testAnnotationProcessor("io.micronaut:micronaut-inject-java")
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.0-M1")
+    testImplementation("org.junit.platform:junit-platform-suite:1.8.0-M1")
     testImplementation("org.mockito:mockito-all:1.10.19")
 }
 
@@ -76,7 +78,9 @@ tasks {
         }
     }
 
-
+    test {
+        useJUnitPlatform()
+    }
 }
 sourceSets {
     main {

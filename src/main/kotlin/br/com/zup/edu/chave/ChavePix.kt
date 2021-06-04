@@ -24,7 +24,7 @@ class ChavePix(
 
     @field:NotBlank
     @field:Column(nullable = false)
-    val cpf: String,
+    val idCliente: String,
 
     @field:NotBlank
     @field:Column(nullable = false)

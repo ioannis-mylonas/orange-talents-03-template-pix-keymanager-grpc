@@ -32,10 +32,10 @@ internal class TestaListagemChavePix {
     private val detalhes1 = ClienteDetalhes(TipoConta.CONTA_CORRENTE,
         instituicao1, "1", "1", titular1)
     private val chaves1 = listOf(
-        ChavePix(TipoChave.RANDOM, UUID.randomUUID().toString(), detalhes1.tipo, titular1.cpf, LocalDateTime.now()),
-        ChavePix(TipoChave.CPF, titular1.cpf, detalhes1.tipo, titular1.cpf, LocalDateTime.now()),
-        ChavePix(TipoChave.PHONE, "+123", detalhes1.tipo, titular1.cpf, LocalDateTime.now()),
-        ChavePix(TipoChave.EMAIL, "1@email.com", detalhes1.tipo, titular1.cpf, LocalDateTime.now())
+        ChavePix(TipoChave.RANDOM, UUID.randomUUID().toString(), detalhes1.tipo, titular1.id, LocalDateTime.now()),
+        ChavePix(TipoChave.CPF, titular1.cpf, detalhes1.tipo, titular1.id, LocalDateTime.now()),
+        ChavePix(TipoChave.PHONE, "+123", detalhes1.tipo, titular1.id, LocalDateTime.now()),
+        ChavePix(TipoChave.EMAIL, "1@email.com", detalhes1.tipo, titular1.id, LocalDateTime.now())
     )
 
     private val titular2 = ClienteDetalhesTitular("2", "2", "2")
@@ -43,10 +43,10 @@ internal class TestaListagemChavePix {
     private val detalhes2 = ClienteDetalhes(TipoConta.CONTA_POUPANCA,
         instituicao2, "2", "2", titular2)
     private val chaves2 = listOf(
-        ChavePix(TipoChave.RANDOM, UUID.randomUUID().toString(), detalhes2.tipo, titular2.cpf, LocalDateTime.now()),
-        ChavePix(TipoChave.CPF, titular2.cpf, detalhes2.tipo, titular2.cpf, LocalDateTime.now()),
-        ChavePix(TipoChave.PHONE, "+456", detalhes2.tipo, titular2.cpf, LocalDateTime.now()),
-        ChavePix(TipoChave.EMAIL, "2@email.com", detalhes2.tipo, titular2.cpf, LocalDateTime.now())
+        ChavePix(TipoChave.RANDOM, UUID.randomUUID().toString(), detalhes2.tipo, titular2.id, LocalDateTime.now()),
+        ChavePix(TipoChave.CPF, titular2.cpf, detalhes2.tipo, titular2.id, LocalDateTime.now()),
+        ChavePix(TipoChave.PHONE, "+456", detalhes2.tipo, titular2.id, LocalDateTime.now()),
+        ChavePix(TipoChave.EMAIL, "2@email.com", detalhes2.tipo, titular2.id, LocalDateTime.now())
     )
 
     @BeforeEach

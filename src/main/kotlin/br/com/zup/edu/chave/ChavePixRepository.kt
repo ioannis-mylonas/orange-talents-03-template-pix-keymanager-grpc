@@ -21,7 +21,7 @@ interface ChavePixRepository: JpaRepository<ChavePix, Long> {
     fun existsByChave(chave: String): Boolean
     fun findByChave(chave: String): Optional<ChavePix>
     fun deleteByChave(chave: String)
-    fun findByCpf(cpf: String): Collection<ChavePix>
+    fun findByIdCliente(idCliente: String): Collection<ChavePix>
 }
 
 /**

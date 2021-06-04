@@ -52,6 +52,7 @@ message DeleteKeyResponse {}
 message GetKeyRequest {
   string idCliente = 1;
   int64 idPix = 2;
+  string chavePix = 3;
 }
 
 message GetKeyResponse {
