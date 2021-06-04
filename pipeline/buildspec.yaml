@@ -48,6 +48,7 @@ phases:
       - helm lint ./pipeline/helm --values ./pipeline/helm/values.yaml
       - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --role-arn $ARN_ROLE
       - kubectl get nodes
+      - helm upgrade -i $PIX_SERVICES_NAME ./pipeline/external-services --values ./pipeline/external-services/values.yaml
       - helm upgrade -i $DEPLOYMENT_NAME ./pipeline/helm --values ./pipeline/helm/values.yaml
 
 cache:
