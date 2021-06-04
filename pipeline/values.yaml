@@ -1,6 +1,0 @@
-DB_URI: "jdbc:postgresql://external-pix-services:5432/pix"
-ITAU_URL: "http://external-pix-services:9091"
-BCB_URL: "http://external-pix-services:8082"
-DB_USER: "keymanager"
-DB_PASSWORD: "123456"
-DB_DIALECT: "POSTGRES"
